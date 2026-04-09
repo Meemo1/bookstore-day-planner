@@ -100,21 +100,21 @@ export default function StopCard({
           </div>
 
           <div className={`text-xs mt-0.5 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-            📍 {store.address}
+            {store.address}
           </div>
 
           <div className={`flex flex-wrap gap-x-4 gap-y-1 mt-1.5 text-xs`}>
-            <span className={darkMode ? 'text-cyan-400' : 'text-cyan-700'}>
-              🕐 Arrive: <strong>{stop.time}</strong>
+            <span className={darkMode ? 'text-gray-300' : 'text-gray-700'}>
+              Arrive <strong>{stop.time}</strong>
             </span>
-            <span className={darkMode ? 'text-purple-400' : 'text-purple-700'}>
-              🏪 Hours: {hours}
+            <span className={darkMode ? 'text-gray-400' : 'text-gray-500'}>
+              {hours}
             </span>
           </div>
 
           {stop.travelTime && (
-            <div className={`flex items-center gap-1 mt-1 text-xs ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
-              {stop.directionMode === 'walking' ? '🚶' : '🚗'}
+            <div className={`flex items-center gap-1 mt-1 text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+              <span>{stop.directionMode === 'walking' ? '🚶' : '🚗'}</span>
               <span>{stop.travelTime} from {stop.travelFrom}</span>
             </div>
           )}
@@ -164,10 +164,10 @@ export default function StopCard({
             className={`px-3 py-2 rounded-lg text-xs font-medium border transition-colors ${
               darkMode
                 ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
-                : 'border-gray-300 text-gray-600 hover:bg-gray-50'
+                : 'border-gray-200 text-gray-500 hover:bg-gray-50'
             }`}
           >
-            🌐 Website
+            Website
           </a>
         )}
 
@@ -183,7 +183,7 @@ export default function StopCard({
                 : 'bg-forest hover:bg-forest-light'
             }`}
           >
-            {stop.directionMode === 'walking' ? '🚶 Walk' : '🚗 Drive'}
+            {stop.directionMode === 'walking' ? '🚶 Directions' : '🚗 Directions'}
           </a>
         )}
 
@@ -193,10 +193,10 @@ export default function StopCard({
           className={`px-3 py-2 rounded-lg text-xs font-medium border transition-colors ${
             note
               ? darkMode ? 'border-yellow-600 text-yellow-400 bg-yellow-900/20' : 'border-yellow-400 text-yellow-700 bg-yellow-50'
-              : darkMode ? 'border-gray-600 text-gray-400 hover:bg-gray-700' : 'border-gray-300 text-gray-500 hover:bg-gray-50'
+              : darkMode ? 'border-gray-600 text-gray-400 hover:bg-gray-700' : 'border-gray-200 text-gray-500 hover:bg-gray-50'
           }`}
         >
-          {note ? '📝 Note' : '📝 Notes'}
+          {note ? '✎ Note' : '✎ Notes'}
         </button>
 
         {/* Skip/unskip */}

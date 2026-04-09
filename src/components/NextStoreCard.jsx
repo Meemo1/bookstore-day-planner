@@ -46,18 +46,18 @@ export default function NextStoreCard({ nextStop, activeDay, darkMode }) {
             {store.name}
           </div>
           <div className={`text-sm mt-0.5 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-            📍 {store.address}
+            {store.address}
           </div>
           <div className={`flex flex-wrap gap-x-4 mt-1 text-sm`}>
-            <span className={darkMode ? 'text-cyan-400' : 'text-cyan-700'}>
-              🕐 Arrive: <strong>{nextStop.time}</strong>
+            <span className={darkMode ? 'text-gray-200' : 'text-gray-800'}>
+              Arrive <strong>{nextStop.time}</strong>
             </span>
-            <span className={darkMode ? 'text-purple-400' : 'text-purple-700'}>
-              🏪 {hours}
+            <span className={darkMode ? 'text-gray-400' : 'text-gray-500'}>
+              {hours}
             </span>
           </div>
           {nextStop.travelTime && (
-            <div className={`text-xs mt-1 ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+            <div className={`text-xs mt-1 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
               {nextStop.directionMode === 'walking' ? '🚶' : '🚗'} {nextStop.travelTime}
             </div>
           )}

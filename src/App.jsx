@@ -86,7 +86,7 @@ export default function App() {
         <div className="max-w-2xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-lg font-bold text-white leading-tight">
+              <h1 className="text-lg font-bold text-white leading-tight font-serif-display tracking-tight">
                 📚 IBD 2026 Route Planner
               </h1>
               <p className="text-xs text-green-200 mt-0.5">
@@ -197,10 +197,10 @@ export default function App() {
               className={`flex-1 min-w-fit px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
                 darkMode
                   ? 'bg-blue-800 text-blue-200 hover:bg-blue-700'
-                  : 'bg-blue-100 text-blue-800 hover:bg-blue-200'
+                  : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
               }`}
             >
-              💾 Export Progress
+              Export Progress
             </button>
             <button
               onClick={() => setShowResetModal(true)}
@@ -210,7 +210,7 @@ export default function App() {
                   : 'bg-red-50 text-red-700 hover:bg-red-100'
               }`}
             >
-              🗑️ Reset All
+              Reset All
             </button>
           </div>
           <p className={`text-xs mt-2 ${darkMode ? 'text-gray-500' : 'text-gray-400'} italic`}>

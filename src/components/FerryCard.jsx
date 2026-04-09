@@ -128,9 +128,9 @@ export default function FerryCard({ stop, darkMode }) {
           </div>
 
           <div className={`flex gap-4 mt-2 text-sm flex-wrap ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-            <span>🕐 Departs: <strong>{stop.departTime}</strong></span>
-            <span>⏱ Duration: {stop.duration} min</span>
-            <span>🏁 Arrives: {stop.arriveTime}</span>
+            <span>Departs <strong>{stop.departTime}</strong></span>
+            <span>{stop.duration} min crossing</span>
+            <span>Arrives {stop.arriveTime}</span>
           </div>
 
           {stop.lineupBy && (
@@ -139,7 +139,7 @@ export default function FerryCard({ stop, darkMode }) {
               isLate ? 'text-amber-700 dark:text-amber-400' :
               darkMode ? 'text-yellow-300' : 'text-yellow-700'
             }`}>
-              ⚠️ Be in line by: {stop.lineupBy}
+              Line up by {stop.lineupBy}
             </div>
           )}
 
