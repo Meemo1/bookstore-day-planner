@@ -1,0 +1,151 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Georgia, 'Times New Roman', serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #FDF8F0;
+}
+::-webkit-scrollbar-thumb {
+  background: #2D5016;
+  border-radius: 4px;
+}
+.dark ::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #3D6B1F;
+}
+
+/* Leaflet custom overrides */
+.leaflet-container {
+  font-family: Georgia, serif;
+}
+
+/* Custom marker styles */
+.store-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+}
+
+.store-marker.visited {
+  background-color: #16a34a;
+}
+
+.store-marker.current {
+  background-color: #dc2626;
+  animation: pulse 1.5s infinite;
+}
+
+.store-marker.upcoming-sat {
+  background-color: #2563eb;
+}
+
+.store-marker.upcoming-sun {
+  background-color: #7c3aed;
+}
+
+.store-marker.unplanned {
+  background-color: #9ca3af;
+}
+
+.store-marker.ferry {
+  background-color: #0891b2;
+}
+
+.home-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #8B2035;
+  border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  font-size: 18px;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
+  50% { transform: scale(1.15); box-shadow: 0 4px 16px rgba(220,38,38,0.6); }
+}
+
+/* Confetti animation */
+@keyframes confettiFall {
+  0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+.confetti-piece {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  top: -10px;
+  animation: confettiFall linear forwards;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+/* Ferry dashed line */
+.leaflet-ferry-line {
+  stroke-dasharray: 10, 8;
+}
+
+/* Tab active state */
+.tab-active {
+  border-bottom: 3px solid #2D5016;
+  color: #2D5016;
+  font-weight: 600;
+}
+
+.dark .tab-active {
+  border-bottom-color: #3D6B1F;
+  color: #6abf4b;
+}
+
+/* Card hover */
+.stop-card {
+  transition: all 0.2s ease;
+}
+
+.stop-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+/* Progress bar animation */
+@keyframes progressFill {
+  from { width: 0%; }
+  to { width: var(--progress-width); }
+}
+
+/* Checked store */
+.visited-overlay {
+  opacity: 0.6;
+}
