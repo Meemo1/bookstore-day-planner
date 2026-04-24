@@ -203,6 +203,16 @@ export default function App() {
     <div className={`min-h-screen transition-colors duration-300 ${
       darkMode ? 'bg-navy-darkest text-cream-border' : 'bg-cream text-ink-900'
     }`}>
+      {/* Tiled IBD logo background */}
+      <div
+        className="fixed inset-0 z-0 pointer-events-none"
+        style={{
+          backgroundImage: 'url(/ibd-logo-2026.png)',
+          backgroundRepeat: 'repeat',
+          backgroundSize: '180px',
+          opacity: 0.13,
+        }}
+      />
       {/* Compact sticky header */}
       <header className={`sticky top-0 z-40 shadow-sm transition-colors duration-300 ${
         darkMode ? 'bg-navy-deep border-b border-navy-border' : 'bg-navy'
