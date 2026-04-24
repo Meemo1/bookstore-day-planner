@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import confetti from 'canvas-confetti';
+import { Sun, Moon, Check, Navigation } from 'lucide-react';
 import { useAppState } from './hooks/useAppState';
 import ItineraryView from './components/ItineraryView';
 import MapView from './components/MapView';
@@ -20,17 +21,17 @@ function ResetConfirmModal({ onConfirm, onCancel, darkMode }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
       <div className={`rounded-2xl p-6 max-w-sm w-full shadow-2xl ${
-        darkMode ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'
+        darkMode ? 'bg-navy-deep text-cream-border' : 'bg-white text-ink-900'
       }`}>
         <h2 className="text-xl font-bold text-center mb-2">Reset All Progress?</h2>
-        <p className={`text-sm text-center mb-6 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+        <p className={`text-sm text-center mb-6 ${darkMode ? 'text-[#6A7A8A]' : 'text-ink-500'}`}>
           This will clear all visited stores, notes, wishlists, purchases, and skipped stores. This cannot be undone.
         </p>
         <div className="flex gap-3">
           <button
             onClick={onCancel}
             className={`flex-1 py-3 rounded-xl font-semibold border-2 transition-colors ${
-              darkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+              darkMode ? 'border-navy-border text-[#A8906A] hover:bg-navy-raised' : 'border-cream-border text-ink-500 hover:bg-cream-page'
             }`}
           >
             Cancel
@@ -53,10 +54,10 @@ function StickyActionBar({ nextStop, activeDay, onMarkVisited, onSkip, darkMode 
   if (!store) {
     return (
       <div className={`fixed bottom-0 left-0 right-0 z-40 border-t shadow-lg ${
-        darkMode ? 'bg-gray-800 border-gray-700' : 'bg-forest border-forest-dark'
+        darkMode ? 'bg-navy-deep border-navy-border' : 'bg-navy border-navy/80'
       }`}>
         <div className="max-w-2xl mx-auto px-4 py-3 text-center">
-          <span className={`text-sm font-semibold ${darkMode ? 'text-green-400' : 'text-white'}`}>
+          <span className="text-sm font-semibold text-white">
             All stores visited — great work!
           </span>
         </div>
@@ -69,12 +70,14 @@ function StickyActionBar({ nextStop, activeDay, onMarkVisited, onSkip, darkMode 
 
   return (
     <div className={`fixed bottom-0 left-0 right-0 z-40 border-t shadow-lg ${
-      darkMode ? 'bg-gray-800 border-gray-700' : 'bg-forest border-forest-dark'
+      darkMode ? 'bg-navy-deep border-navy-border' : 'bg-white border-cream-border'
     }`}>
       <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
         <div className="flex-1 min-w-0">
-          <div className="font-semibold text-sm text-white truncate">{store.name}</div>
-          <div className="text-xs text-white/70">
+          <div className={`font-semibold text-sm truncate ${darkMode ? 'text-cream-border' : 'text-ink-900'}`}>
+            {store.name}
+          </div>
+          <div className={`text-xs ${darkMode ? 'text-[#6A7A8A]' : 'text-ink-500'}`}>
             {nextStop.time} · {hours}
             {nextStop.travelTime ? ` · ${nextStop.travelTime}` : ''}
           </div>
@@ -84,22 +87,25 @@ function StickyActionBar({ nextStop, activeDay, onMarkVisited, onSkip, darkMode 
             href={nextStop.directionUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-3 py-2 rounded-lg text-xs font-bold bg-white/15 hover:bg-white/25 text-white transition-colors whitespace-nowrap"
+            className="px-3 py-2 rounded-lg text-xs font-bold bg-navy-light hover:bg-navy-hover text-white transition-colors whitespace-nowrap"
           >
             {nextStop.directionMode === 'walking' ? 'Walk' : 'Drive'}
           </a>
         )}
         <button
           onClick={() => onSkip(nextStop.storeId)}
-          className="px-3 py-2 rounded-lg text-xs font-bold bg-white/10 hover:bg-white/20 text-white/80 transition-colors"
+          className={`px-3 py-2 rounded-lg text-xs font-bold transition-colors ${
+            darkMode ? 'bg-navy-raised text-[#A8906A] hover:bg-navy-border' : 'bg-cream-page text-ink-500 hover:bg-cream-border'
+          }`}
         >
           Skip
         </button>
         <button
           onClick={() => onMarkVisited(nextStop.storeId)}
-          className="px-3 py-2 rounded-lg text-xs font-bold bg-white text-forest hover:bg-white/90 transition-colors"
+          className="px-3 py-2 rounded-lg text-xs font-bold bg-navy-light hover:bg-navy-hover text-white transition-colors active:scale-[0.97] flex items-center gap-1"
         >
-          ✓ Visited
+          <Check size={12} strokeWidth={2.5} />
+          Visited
         </button>
       </div>
     </div>
@@ -160,14 +166,14 @@ export default function App() {
       particleCount: isFinal ? 200 : 100,
       spread: isFinal ? 120 : 80,
       origin: { y: 0.4 },
-      colors: ['#2D5016', '#8B2035', '#FDF8F0', '#FFD700', '#3D6B1F'],
+      colors: ['#1B3A5C', '#D4A030', '#FDF8F0', '#C4752A', '#2860A0'],
       gravity: isFinal ? 0.8 : 1,
       scalar: isFinal ? 1.4 : 1,
     });
     if (isFinal) {
       setTimeout(() => {
-        confetti({ particleCount: 150, angle: 60, spread: 80, origin: { x: 0, y: 0.5 }, colors: ['#2D5016', '#8B2035', '#FFD700'] });
-        confetti({ particleCount: 150, angle: 120, spread: 80, origin: { x: 1, y: 0.5 }, colors: ['#2D5016', '#8B2035', '#FFD700'] });
+        confetti({ particleCount: 150, angle: 60, spread: 80, origin: { x: 0, y: 0.5 }, colors: ['#1B3A5C', '#D4A030', '#C4752A'] });
+        confetti({ particleCount: 150, angle: 120, spread: 80, origin: { x: 1, y: 0.5 }, colors: ['#1B3A5C', '#D4A030', '#C4752A'] });
       }, 400);
     }
   }, [visitedCount]);
@@ -195,20 +201,23 @@ export default function App() {
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${
-      darkMode ? 'bg-gray-900 text-gray-100' : 'bg-cream-100 text-gray-900'
+      darkMode ? 'bg-navy-darkest text-cream-border' : 'bg-cream text-ink-900'
     }`}>
       {/* Compact sticky header */}
-      <header className={`sticky top-0 z-40 shadow-sm ${
-        darkMode ? 'bg-gray-800 border-b border-gray-700' : 'bg-forest'
+      <header className={`sticky top-0 z-40 shadow-sm transition-colors duration-300 ${
+        darkMode ? 'bg-navy-deep border-b border-navy-border' : 'bg-navy'
       }`}>
         <div className="max-w-2xl mx-auto px-4 pt-3 pb-2">
           {/* Row 1: title + dark mode */}
           <div className="flex items-center justify-between mb-2">
             <div>
-              <h1 className="text-base font-bold text-white font-serif-display tracking-tight">
+              <h1
+                className="text-[26px] font-bold text-white font-display tracking-tight leading-tight"
+                style={{ fontVariationSettings: "'opsz' 72" }}
+              >
                 IBD 2026 Route Planner
               </h1>
-              <p className="text-xs text-white/60 mt-0.5">
+              <p className="text-xs text-white/50 mt-0.5">
                 {activeSection === 'route' && `${visitedCount} of ${totalPlanned} stores · Apr 25–26`}
                 {activeSection === 'wishlist' && (wishlistTotal > 0
                   ? `${wishlistFound} of ${wishlistTotal} found`
@@ -218,15 +227,15 @@ export default function App() {
             </div>
             <button
               onClick={toggleDarkMode}
-              className="w-8 h-8 rounded-full flex items-center justify-center bg-white/10 hover:bg-white/20 text-white transition-colors text-sm"
+              className="w-8 h-8 rounded-full flex items-center justify-center bg-white/10 hover:bg-white/20 text-white transition-colors"
               title={darkMode ? 'Light mode' : 'Dark mode'}
             >
-              {darkMode ? '☀️' : '🌙'}
+              {darkMode ? <Sun size={16} strokeWidth={2} /> : <Moon size={16} strokeWidth={2} />}
             </button>
           </div>
 
           {/* Row 2: section tabs */}
-          <div className={`flex gap-1 mb-2 rounded-lg p-0.5 ${darkMode ? 'bg-gray-700/50' : 'bg-black/10'}`}>
+          <div className={`flex gap-1 mb-2 rounded-lg p-0.5 ${darkMode ? 'bg-navy-border/50' : 'bg-black/10'}`}>
             {SECTIONS.map(({ id, label }) => (
               <button
                 key={id}
@@ -234,7 +243,7 @@ export default function App() {
                 className={`flex-1 py-1.5 rounded-md text-xs font-semibold transition-colors ${
                   activeSection === id
                     ? 'bg-white/20 text-white'
-                    : 'text-white/50 hover:text-white/80'
+                    : 'text-white/70 hover:text-white'
                 }`}
               >
                 {label}
@@ -244,10 +253,10 @@ export default function App() {
 
           {/* Row 3: progress bar (Route only) */}
           {activeSection === 'route' && (
-            <div className={`h-1.5 rounded-full overflow-hidden ${darkMode ? 'bg-gray-700' : 'bg-white/20'}`}>
+            <div className={`h-[3px] rounded-full overflow-hidden ${darkMode ? 'bg-navy-border' : 'bg-white/20'}`}>
               <div
-                className={`h-full rounded-full transition-all duration-700 ease-out ${
-                  visitedCount === totalPlanned ? 'bg-yellow-400' : 'bg-white/80'
+                className={`h-full rounded-full transition-[width] duration-700 ease-out ${
+                  visitedCount === totalPlanned ? 'bg-gold' : 'bg-white/80'
                 }`}
                 style={{ width: `${pct}%` }}
               />
@@ -262,7 +271,7 @@ export default function App() {
         {activeSection === 'route' && (
           <>
             {/* List / Map sub-toggle */}
-            <div className={`flex rounded-xl p-1 ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm`}>
+            <div className={`flex rounded-xl p-1 ${darkMode ? 'bg-navy-deep' : 'bg-white'} shadow-sm`}>
               {[
                 { id: 'itinerary', label: 'List' },
                 { id: 'map', label: 'Map' },
@@ -272,8 +281,8 @@ export default function App() {
                   onClick={() => setActiveView(v.id)}
                   className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
                     activeView === v.id
-                      ? darkMode ? 'bg-gray-700 text-green-400 shadow' : 'bg-forest text-white shadow'
-                      : darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'
+                      ? darkMode ? 'bg-navy-raised text-cream-border shadow' : 'bg-navy-light text-white shadow'
+                      : darkMode ? 'text-[#6A7A8A] hover:text-cream-border' : 'text-ink-500 hover:text-ink-900'
                   }`}
                 >
                   {v.label}
@@ -294,10 +303,10 @@ export default function App() {
                       onClick={() => setMapDayFilter(f.id)}
                       className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
                         mapDayFilter === f.id
-                          ? 'bg-forest text-white'
+                          ? 'bg-navy-light text-white'
                           : darkMode
-                            ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                            : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
+                            ? 'bg-navy-raised text-[#A8906A] hover:bg-navy-border'
+                            : 'bg-white text-ink-500 hover:bg-cream-page border border-cream-border'
                       }`}
                     >
                       {f.label}
@@ -327,9 +336,9 @@ export default function App() {
             )}
 
             {/* Data management */}
-            <div className={`rounded-xl p-4 ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm`}>
+            <div className={`rounded-xl p-4 ${darkMode ? 'bg-navy-deep' : 'bg-white'} shadow-sm`}>
               <h3 className={`text-xs font-bold uppercase tracking-wider mb-3 ${
-                darkMode ? 'text-gray-400' : 'text-gray-500'
+                darkMode ? 'text-[#6A7A8A]' : 'text-ink-300'
               }`}>
                 Data
               </h3>
@@ -338,8 +347,8 @@ export default function App() {
                   onClick={exportProgress}
                   className={`flex-1 min-w-fit px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
                     darkMode
-                      ? 'bg-gray-700 text-gray-200 hover:bg-gray-600'
-                      : 'bg-cream-100 text-gray-700 hover:bg-cream-200 border border-cream-200'
+                      ? 'bg-navy-raised text-cream-border hover:bg-navy-border'
+                      : 'bg-cream-page text-ink-700 hover:bg-cream-border border border-cream-border'
                   }`}
                 >
                   Export
@@ -355,8 +364,8 @@ export default function App() {
                   onClick={() => importInputRef.current?.click()}
                   className={`flex-1 min-w-fit px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
                     darkMode
-                      ? 'bg-gray-700 text-gray-200 hover:bg-gray-600'
-                      : 'bg-cream-100 text-gray-700 hover:bg-cream-200 border border-cream-200'
+                      ? 'bg-navy-raised text-cream-border hover:bg-navy-border'
+                      : 'bg-cream-page text-ink-700 hover:bg-cream-border border border-cream-border'
                   }`}
                 >
                   Import
@@ -372,12 +381,12 @@ export default function App() {
                   Reset
                 </button>
               </div>
-              <p className={`text-xs mt-2 ${darkMode ? 'text-gray-600' : 'text-gray-400'} italic`}>
+              <p className={`text-xs mt-2 italic ${darkMode ? 'text-[#6A7A8A]' : 'text-ink-300'}`}>
                 Saved automatically. Export a backup before switching devices.
               </p>
             </div>
 
-            <div className={`text-center text-xs py-2 ${darkMode ? 'text-gray-600' : 'text-gray-400'}`}>
+            <div className={`text-center text-xs py-2 ${darkMode ? 'text-[#6A7A8A]' : 'text-ink-300'}`}>
               {SATURDAY_DATE} &amp; {SUNDAY_DATE}
             </div>
           </>

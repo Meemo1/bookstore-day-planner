@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Ship, BookOpen, Folder, Utensils, Car, Home, Check } from 'lucide-react';
 import { saturdayRoute, sundayRoute } from '../data/routes';
 import { getStoreById, stores, plannedStoreIds } from '../data/stores';
 import StopCard from './StopCard';
@@ -19,8 +20,8 @@ function LiveClock({ darkMode }) {
   const h = hours % 12 || 12;
 
   return (
-    <div className={`flex items-center gap-2 text-sm font-mono ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-      <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse inline-block" />
+    <div className={`flex items-center gap-2 text-sm font-mono ${darkMode ? 'text-[#6A7A8A]' : 'text-ink-500'}`}>
+      <span className="w-2 h-2 rounded-full bg-teal animate-pulse inline-block" />
       <span className="font-semibold">{h}:{minutes}:{seconds} {ampm}</span>
     </div>
   );
@@ -54,21 +55,21 @@ function ScheduleDelta({ stop, activeDay, darkMode }) {
 
   if (delta === null) return null;
   if (Math.abs(delta) < 3) return (
-    <span className="text-xs px-2 py-0.5 rounded-full bg-forest/10 text-forest dark:bg-forest/20 dark:text-green-400">
+    <span className="text-xs px-2 py-0.5 rounded-full bg-teal-tint text-teal">
       On time
     </span>
   );
   if (delta > 0) return (
     <span className={`text-xs px-2 py-0.5 rounded-full ${
       delta > 30
-        ? 'bg-burgundy/10 text-burgundy dark:bg-burgundy/20 dark:text-red-400'
-        : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+        ? 'bg-amber-tint text-amber-dark border border-amber-border'
+        : 'bg-amber-tint text-amber'
     }`}>
       +{delta} min
     </span>
   );
   return (
-    <span className="text-xs px-2 py-0.5 rounded-full bg-cream-200 text-forest dark:bg-forest/20 dark:text-green-400">
+    <span className="text-xs px-2 py-0.5 rounded-full bg-teal-tint text-teal">
       {delta} min (early!)
     </span>
   );
@@ -77,15 +78,15 @@ function ScheduleDelta({ stop, activeDay, darkMode }) {
 function MealCard({ stop, darkMode }) {
   return (
     <div className={`rounded-xl p-4 border-2 border-dashed ${
-      darkMode ? 'border-amber-700 bg-amber-900/10' : 'border-amber-400 bg-amber-50'
+      darkMode ? 'border-amber-border/60 bg-amber/10' : 'border-amber-border bg-amber-tint'
     }`}>
       <div className="flex items-center gap-3">
-        <span className="text-2xl">🍽️</span>
+        <Utensils size={22} strokeWidth={1.5} className={darkMode ? 'text-amber' : 'text-amber-dark'} />
         <div>
-          <div className={`font-bold ${darkMode ? 'text-amber-300' : 'text-amber-800'}`}>
+          <div className={`font-bold ${darkMode ? 'text-amber' : 'text-amber-dark'}`}>
             {stop.time} — {stop.label}
           </div>
-          <div className={`text-sm ${darkMode ? 'text-amber-400' : 'text-amber-700'}`}>
+          <div className={`text-sm ${darkMode ? 'text-[#A8906A]' : 'text-amber-dark'}`}>
             {stop.description}
           </div>
         </div>
@@ -97,16 +98,16 @@ function MealCard({ stop, darkMode }) {
 function TransitCard({ stop, darkMode }) {
   return (
     <div className={`rounded-xl p-3 border ${
-      darkMode ? 'border-gray-700 bg-gray-800/60' : 'border-gray-200 bg-gray-50'
+      darkMode ? 'border-navy-border bg-navy-deep/60' : 'border-cream-border bg-cream-page'
     }`}>
       <div className="flex items-center gap-2">
-        <span className="text-lg">🚗</span>
+        <Car size={16} strokeWidth={1.5} className={darkMode ? 'text-[#6A7A8A]' : 'text-ink-300'} />
         <div>
-          <span className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+          <span className={`text-sm font-medium ${darkMode ? 'text-cream-border' : 'text-ink-700'}`}>
             {stop.time} — {stop.label}
           </span>
           {stop.description && (
-            <span className={`ml-2 text-xs ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+            <span className={`ml-2 text-xs ${darkMode ? 'text-[#6A7A8A]' : 'text-ink-500'}`}>
               {stop.description}
             </span>
           )}
@@ -119,15 +120,15 @@ function TransitCard({ stop, darkMode }) {
 function HomeCard({ stop, darkMode }) {
   return (
     <div className={`rounded-xl p-4 border-2 ${
-      darkMode ? 'border-burgundy bg-burgundy/10' : 'border-burgundy bg-red-50'
+      darkMode ? 'bg-navy-raised border-navy-border' : 'bg-navy border-navy-light'
     }`}>
       <div className="flex items-center gap-3">
-        <span className="text-2xl">🏠</span>
+        <Home size={22} strokeWidth={1.5} className="text-white" />
         <div className="flex-1">
-          <div className={`font-bold ${darkMode ? 'text-red-300' : 'text-burgundy'}`}>
+          <div className="font-bold text-white">
             {stop.time} — Home!
           </div>
-          <div className={`text-xs mt-0.5 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+          <div className="text-xs mt-0.5 text-white/60">
             You made it! Time to rest (and sort your book haul)
           </div>
         </div>
@@ -136,9 +137,10 @@ function HomeCard({ stop, darkMode }) {
             href={stop.directionUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-3 py-2 rounded-lg text-xs font-semibold text-white bg-forest hover:bg-forest-light transition-colors"
+            className="px-3 py-2 rounded-lg text-xs font-semibold text-white bg-navy-light hover:bg-navy-hover transition-colors flex items-center gap-1"
           >
-            🚗 Home
+            <Car size={12} strokeWidth={2} />
+            Home
           </a>
         )}
       </div>
@@ -147,7 +149,6 @@ function HomeCard({ stop, darkMode }) {
 }
 
 function ContingencyTab({ visitedStores, skippedStores, contingencyStores, notes, onMarkVisited, onUnmarkVisited, onSetNote, darkMode }) {
-  // Stores not on either day's route
   const { saturdayStoreIds, sundayStoreIds } = contingencyStores;
   const allUnplanned = stores.filter(s =>
     !saturdayStoreIds.includes(s.id) && !sundayStoreIds.includes(s.id) && !skippedStores.includes(s.id)
@@ -158,30 +159,31 @@ function ContingencyTab({ visitedStores, skippedStores, contingencyStores, notes
     <div className="space-y-4">
       {skipped.length > 0 && (
         <div>
-          <h3 className={`text-sm font-bold uppercase tracking-wider mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+          <h3 className={`text-sm font-bold uppercase tracking-wider mb-2 ${darkMode ? 'text-[#6A7A8A]' : 'text-ink-500'}`}>
             Skipped Stores ({skipped.length})
           </h3>
           <div className="space-y-2">
             {skipped.map(store => (
-              <div key={store.id} className={`rounded-xl p-4 border ${darkMode ? 'border-gray-700 bg-gray-800' : 'border-cream-200 bg-cream-50'}`}>
+              <div key={store.id} className={`rounded-xl p-4 border ${darkMode ? 'border-navy-border bg-navy-deep' : 'border-cream-border bg-cream-white'}`}>
                 <div className="flex items-center justify-between gap-2">
                   <div>
-                    <div className={`font-semibold ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
+                    <div className={`font-semibold ${darkMode ? 'text-cream-border' : 'text-ink-900'}`}>
                       {store.name}
                     </div>
-                    <div className={`text-xs mt-0.5 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                    <div className={`text-xs mt-0.5 ${darkMode ? 'text-[#6A7A8A]' : 'text-ink-500'}`}>
                       {store.address}
                     </div>
-                    <div className={`text-xs mt-1 ${darkMode ? 'text-gray-500' : 'text-gray-600'}`}>
+                    <div className={`text-xs mt-1 ${darkMode ? 'text-[#6A7A8A]' : 'text-ink-500'}`}>
                       Sat: {store.hours.sat_ibd} · Sun: {store.hours.sun}
                     </div>
                   </div>
                   <div className="flex gap-2">
                     <button
                       onClick={() => onMarkVisited(store.id)}
-                      className="px-3 py-2 rounded-lg text-xs font-bold text-white bg-forest hover:bg-forest-light transition-colors"
+                      className="px-3 py-2 rounded-lg text-xs font-bold text-white bg-navy-light hover:bg-navy-hover transition-colors flex items-center gap-1"
                     >
-                      ✓ Visited
+                      <Check size={12} strokeWidth={2.5} />
+                      Visited
                     </button>
                   </div>
                 </div>
@@ -192,27 +194,27 @@ function ContingencyTab({ visitedStores, skippedStores, contingencyStores, notes
       )}
 
       <div>
-        <h3 className={`text-sm font-bold uppercase tracking-wider mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+        <h3 className={`text-sm font-bold uppercase tracking-wider mb-2 ${darkMode ? 'text-[#6A7A8A]' : 'text-ink-500'}`}>
           Third Place Alternatives
         </h3>
-        <p className={`text-sm mb-3 ${darkMode ? 'text-gray-500' : 'text-gray-500'} italic`}>
+        <p className={`text-sm mb-3 italic ${darkMode ? 'text-[#6A7A8A]' : 'text-ink-500'}`}>
           You only need to visit ONE Third Place Books location. Third Place Ravenna is on the Saturday route.
         </p>
         {stores.filter(s => s.thirdPlace && s.id !== 'thirdplaceravenna').map(store => (
-          <div key={store.id} className={`rounded-xl p-4 border mb-2 ${darkMode ? 'border-gray-700 bg-gray-800' : 'border-cream-200 bg-cream-50'}`}>
+          <div key={store.id} className={`rounded-xl p-4 border mb-2 ${darkMode ? 'border-navy-border bg-navy-deep' : 'border-cream-border bg-cream-white'}`}>
             <div className="flex items-center justify-between gap-2">
               <div>
-                <div className={`font-semibold ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
+                <div className={`font-semibold ${darkMode ? 'text-cream-border' : 'text-ink-900'}`}>
                   {store.name}
                 </div>
-                <div className={`text-xs mt-0.5 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                <div className={`text-xs mt-0.5 ${darkMode ? 'text-[#6A7A8A]' : 'text-ink-500'}`}>
                   {store.address}
                 </div>
-                <div className={`text-xs mt-1 ${darkMode ? 'text-gray-500' : 'text-gray-600'}`}>
+                <div className={`text-xs mt-1 ${darkMode ? 'text-[#6A7A8A]' : 'text-ink-500'}`}>
                   Sat IBD: {store.hours.sat_ibd}
                 </div>
                 {store.notes && (
-                  <div className={`text-xs mt-1 italic ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                  <div className={`text-xs mt-1 italic ${darkMode ? 'text-[#6A7A8A]' : 'text-ink-500'}`}>
                     {store.notes}
                   </div>
                 )}
@@ -240,7 +242,6 @@ export default function ItineraryView({
 }) {
   const route = activeDay === 'saturday' ? saturdayRoute : sundayRoute;
 
-  // Determine "current" stop: next unvisited store stop
   const currentStop = activeDay !== 'contingency'
     ? route.find(s => s.type === 'store' && !visitedStores.includes(s.storeId) && !skippedStores.includes(s.storeId))
     : null;
@@ -253,29 +254,27 @@ export default function ItineraryView({
   };
 
   const tabs = [
-    { id: 'saturday', label: 'Saturday Apr 25', emoji: '⛴️' },
-    { id: 'sunday', label: 'Sunday Apr 26', emoji: '📚' },
-    { id: 'contingency', label: 'Contingency', emoji: '🗂️' },
+    { id: 'saturday', label: 'Saturday Apr 25', Icon: Ship },
+    { id: 'sunday', label: 'Sunday Apr 26', Icon: BookOpen },
+    { id: 'contingency', label: 'Contingency', Icon: Folder },
   ];
 
   return (
     <div>
       {/* Tab navigation */}
-      <div className={`flex border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'} mb-4 overflow-x-auto`}>
-        {tabs.map(tab => (
+      <div className={`flex border-b ${darkMode ? 'border-navy-border' : 'border-cream-border'} mb-4 overflow-x-auto`}>
+        {tabs.map(({ id, label, Icon }) => (
           <button
-            key={tab.id}
-            onClick={() => setActiveDay(tab.id)}
+            key={id}
+            onClick={() => setActiveDay(id)}
             className={`px-4 py-3 text-sm font-medium whitespace-nowrap flex items-center gap-1.5 transition-colors border-b-2 ${
-              activeDay === tab.id
-                ? darkMode
-                  ? 'border-green-500 text-green-400'
-                  : 'border-forest text-forest'
-                : `border-transparent ${darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'}`
+              activeDay === id
+                ? 'border-navy-light text-navy-light font-semibold'
+                : `border-transparent ${darkMode ? 'text-[#6A7A8A] hover:text-cream-border' : 'text-ink-500 hover:text-ink-900'}`
             }`}
           >
-            <span>{tab.emoji}</span>
-            <span>{tab.label}</span>
+            <Icon size={14} strokeWidth={2} />
+            <span>{label}</span>
           </button>
         ))}
         <div className="ml-auto flex items-center pr-2">
@@ -304,7 +303,7 @@ export default function ItineraryView({
               return (
                 <div key={stop.id}>
                   <div className="flex items-center gap-2 mb-1.5">
-                    <span className={`text-xs font-semibold ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                    <span className={`text-xs font-semibold ${darkMode ? 'text-[#6A7A8A]' : 'text-ink-300'}`}>
                       Stop {storeCount}
                     </span>
                     {isCurrent && (

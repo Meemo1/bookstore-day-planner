@@ -8,21 +8,50 @@ export default {
   theme: {
     extend: {
       colors: {
+        navy: {
+          darkest: '#0E1A27',
+          deep:    '#162234',
+          raised:  '#1E2E42',
+          border:  '#2A3E58',
+          DEFAULT: '#1B3A5C',
+          light:   '#2860A0',
+          hover:   '#3474B8',
+        },
         cream: {
-          50: '#FDFAF4',
-          100: '#FDF8F0',
-          200: '#FAF0DC',
+          white:  '#FEFCF7',
+          DEFAULT: '#FDF8F0',
+          page:   '#F4EEE4',
+          border: '#E8D8C0',
+          deep:   '#DFD0B8',
         },
-        forest: {
-          DEFAULT: '#2D5016',
-          light: '#3D6B1F',
-          dark: '#1E3610',
+        ink: {
+          900: '#1A1510',
+          700: '#2E2416',
+          500: '#6A5848',
+          300: '#A89280',
+          100: '#D4C8BA',
         },
-        burgundy: {
-          DEFAULT: '#8B2035',
-          light: '#A82A42',
-          dark: '#6B1828',
+        amber: {
+          dark:    '#8A5010',
+          DEFAULT: '#C4752A',
+          border:  '#E8B870',
+          tint:    '#FEF3E6',
         },
+        teal: {
+          DEFAULT: '#1D6B4A',
+          border:  '#8CCDB0',
+          tint:    '#E6F5EF',
+        },
+        gold: {
+          DEFAULT: '#D4A030',
+          tint:    '#FDF8E8',
+        },
+        ferry: '#0891b2',
+      },
+      fontFamily: {
+        display: ['Fraunces', 'Georgia', 'serif'],
+        body:    ['Figtree', 'system-ui', 'sans-serif'],
+        mono:    ['JetBrains Mono', 'ui-monospace', 'monospace'],
       },
     },
   },

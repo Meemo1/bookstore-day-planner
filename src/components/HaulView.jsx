@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Lock, Unlock, X } from 'lucide-react';
 import { saturdayRoute, sundayRoute } from '../data/routes';
 import { getStoreById } from '../data/stores';
 
@@ -9,8 +10,10 @@ function PinModal({ mode, onConfirm, onCancel, darkMode }) {
   const [confirmPin, setConfirmPin] = useState('');
   const [error, setError] = useState('');
 
-  const inputClass = `w-full text-center text-xl tracking-[0.4em] px-3 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-forest ${
-    darkMode ? 'bg-gray-700 border-gray-600 text-gray-200' : 'bg-cream-50 border-gray-200 text-gray-800'
+  const inputClass = `w-full text-center text-xl tracking-[0.4em] px-3 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-navy-light ${
+    darkMode
+      ? 'bg-navy-raised border-navy-border text-cream-border placeholder-[#6A7A8A]'
+      : 'bg-cream-page border-cream-border text-ink-900'
   }`;
 
   const handleSubmit = () => {
@@ -32,12 +35,12 @@ function PinModal({ mode, onConfirm, onCancel, darkMode }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
       <div className={`rounded-2xl p-6 max-w-xs w-full shadow-2xl ${
-        darkMode ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'
+        darkMode ? 'bg-navy-deep text-cream-border' : 'bg-white text-ink-900'
       }`}>
         <h2 className="text-lg font-bold text-center mb-1">
           {mode === 'set' ? 'Set a cost PIN' : 'Enter PIN'}
         </h2>
-        <p className={`text-xs text-center mb-5 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+        <p className={`text-xs text-center mb-5 ${darkMode ? 'text-[#6A7A8A]' : 'text-ink-500'}`}>
           {mode === 'set'
             ? 'Hides purchase totals from casual viewing'
             : 'Costs are hidden until unlocked'}
@@ -66,20 +69,20 @@ function PinModal({ mode, onConfirm, onCancel, darkMode }) {
           )}
         </div>
         {error && (
-          <p className="text-burgundy text-xs text-center mt-2">{error}</p>
+          <p className="text-amber-dark text-xs text-center mt-2">{error}</p>
         )}
         <div className="flex gap-2 mt-5">
           <button
             onClick={onCancel}
             className={`flex-1 py-2.5 rounded-xl text-sm font-semibold border-2 transition-colors ${
-              darkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+              darkMode ? 'border-navy-border text-[#A8906A] hover:bg-navy-raised' : 'border-cream-border text-ink-500 hover:bg-cream-page'
             }`}
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
-            className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white bg-forest hover:bg-forest-light transition-colors"
+            className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white bg-navy-light hover:bg-navy-hover transition-colors"
           >
             {mode === 'set' ? 'Set PIN' : 'Unlock'}
           </button>
@@ -104,22 +107,24 @@ function StoreHaulSection({ store, items, costsVisible, onAdd, onRemove, darkMod
 
   const storeTotal = items.reduce((sum, p) => sum + p.cost, 0);
 
-  const inputClass = (extra = '') => `text-sm px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-forest ${
-    darkMode ? 'bg-gray-700 border-gray-600 text-gray-200 placeholder-gray-500' : 'bg-white border-gray-200 text-gray-800 placeholder-gray-400'
+  const inputClass = (extra = '') => `text-sm px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-navy-light ${
+    darkMode
+      ? 'bg-navy-raised border-navy-border text-cream-border placeholder-[#6A7A8A]'
+      : 'bg-cream-white border-cream-border text-ink-900 placeholder-ink-300'
   } ${extra}`;
 
   return (
-    <div className={`rounded-xl overflow-hidden ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm`}>
+    <div className={`rounded-xl overflow-hidden shadow-sm ${darkMode ? 'bg-navy-deep' : 'bg-cream-white'}`}>
       {/* Store header */}
       <div className={`flex items-center justify-between px-4 py-3 ${
-        (items.length > 0 || adding) ? (darkMode ? 'border-b border-gray-700' : 'border-b border-cream-200') : ''
+        (items.length > 0 || adding) ? (darkMode ? 'border-b border-navy-border' : 'border-b border-cream-border') : ''
       }`}>
         <div className="flex-1 min-w-0">
-          <div className={`font-semibold text-sm ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
+          <div className={`font-semibold text-sm ${darkMode ? 'text-cream-border' : 'text-ink-900'}`}>
             {store.name}
           </div>
           {items.length > 0 && (
-            <div className={`text-xs mt-0.5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+            <div className={`text-xs mt-0.5 ${darkMode ? 'text-[#6A7A8A]' : 'text-ink-300'}`}>
               {items.length} item{items.length !== 1 ? 's' : ''}
               {costsVisible ? ` · $${storeTotal.toFixed(2)}` : ''}
             </div>
@@ -128,7 +133,9 @@ function StoreHaulSection({ store, items, costsVisible, onAdd, onRemove, darkMod
         <button
           onClick={() => setAdding(a => !a)}
           className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-colors ${
-            darkMode ? 'bg-forest/20 text-green-300 hover:bg-forest/30' : 'bg-forest/10 text-forest hover:bg-forest/20'
+            darkMode
+              ? 'bg-navy-light/10 text-navy-light hover:bg-navy-light/20'
+              : 'bg-navy-light/10 text-navy-light hover:bg-navy-light/20'
           }`}
         >
           + Add
@@ -137,7 +144,7 @@ function StoreHaulSection({ store, items, costsVisible, onAdd, onRemove, darkMod
 
       {/* Inline add form */}
       {adding && (
-        <div className={`px-4 py-3 space-y-2 ${darkMode ? 'bg-gray-700/40 border-b border-gray-700' : 'bg-cream-50 border-b border-cream-200'}`}>
+        <div className={`px-4 py-3 space-y-2 ${darkMode ? 'bg-navy-raised/40 border-b border-navy-border' : 'bg-cream-page border-b border-cream-border'}`}>
           <input
             value={itemText}
             onChange={e => setItemText(e.target.value)}
@@ -148,7 +155,7 @@ function StoreHaulSection({ store, items, costsVisible, onAdd, onRemove, darkMod
           />
           <div className="flex gap-2">
             <div className="relative flex-1">
-              <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${darkMode ? 'text-gray-400' : 'text-gray-400'}`}>$</span>
+              <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm ${darkMode ? 'text-[#6A7A8A]' : 'text-ink-300'}`}>$</span>
               <input
                 type="number"
                 inputMode="decimal"
@@ -161,15 +168,15 @@ function StoreHaulSection({ store, items, costsVisible, onAdd, onRemove, darkMod
             </div>
             <button
               onClick={handleAdd}
-              className="px-4 py-2 rounded-lg text-sm font-bold text-white bg-forest hover:bg-forest-light transition-colors"
+              className="px-4 py-2 rounded-lg text-sm font-bold text-white bg-navy-light hover:bg-navy-hover transition-colors"
             >
               Save
             </button>
             <button
               onClick={() => { setAdding(false); setItemText(''); setCostText(''); }}
-              className={`px-3 py-2 rounded-lg text-sm transition-colors ${darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-400 hover:text-gray-600'}`}
+              className={`px-3 py-2 rounded-lg text-sm transition-colors ${darkMode ? 'text-[#6A7A8A] hover:text-cream-border' : 'text-ink-300 hover:text-ink-700'}`}
             >
-              ✕
+              <X size={14} strokeWidth={2} />
             </button>
           </div>
         </div>
@@ -180,26 +187,26 @@ function StoreHaulSection({ store, items, costsVisible, onAdd, onRemove, darkMod
         <div
           key={purchase.id}
           className={`flex items-center gap-3 px-4 py-3 ${
-            idx < items.length - 1 ? (darkMode ? 'border-b border-gray-700/50' : 'border-b border-cream-100') : ''
+            idx < items.length - 1 ? (darkMode ? 'border-b border-navy-border/50' : 'border-b border-cream-border/50') : ''
           }`}
         >
-          <div className={`flex-1 text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+          <div className={`flex-1 text-sm ${darkMode ? 'text-cream-border' : 'text-ink-700'}`}>
             {purchase.item}
           </div>
           <div className={`text-sm font-semibold min-w-[56px] text-right ${
             costsVisible
-              ? darkMode ? 'text-gray-300' : 'text-gray-700'
-              : darkMode ? 'text-gray-600' : 'text-gray-300'
+              ? darkMode ? 'text-cream-border' : 'text-ink-700'
+              : darkMode ? 'text-[#6A7A8A]' : 'text-ink-100'
           }`}>
             {costsVisible ? `$${purchase.cost.toFixed(2)}` : '—'}
           </div>
           <button
             onClick={() => onRemove(store.id, purchase.id)}
             className={`text-xs pl-2 transition-colors ${
-              darkMode ? 'text-gray-600 hover:text-gray-400' : 'text-gray-300 hover:text-gray-500'
+              darkMode ? 'text-[#6A7A8A] hover:text-[#A8906A]' : 'text-ink-100 hover:text-ink-300'
             }`}
           >
-            ✕
+            <X size={13} strokeWidth={2} />
           </button>
         </div>
       ))}
@@ -218,7 +225,6 @@ export default function HaulView({ purchases, visitedStores, onAdd, onRemove, da
   const [showPinModal, setShowPinModal] = useState(false);
   const [pinMode, setPinMode] = useState('enter');
 
-  // Stores to show: visited OR already has purchases, in route order
   const relevantStoreIds = routeStoreIds.filter(id =>
     visitedStores.includes(id) || (purchases[id]?.length > 0)
   );
@@ -235,35 +241,37 @@ export default function HaulView({ purchases, visitedStores, onAdd, onRemove, da
   return (
     <div className="space-y-4">
       {/* Summary bar */}
-      <div className={`flex items-center justify-between rounded-xl px-4 py-3 ${
-        darkMode ? 'bg-gray-800' : 'bg-white'
-      } shadow-sm`}>
+      <div className={`flex items-center justify-between rounded-xl px-4 py-3 shadow-sm ${
+        darkMode ? 'bg-navy-deep' : 'bg-cream-white'
+      }`}>
         <div>
-          <div className={`text-sm font-semibold ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
+          <div className={`text-sm font-semibold ${darkMode ? 'text-cream-border' : 'text-ink-900'}`}>
             {allItems.length} item{allItems.length !== 1 ? 's' : ''} purchased
           </div>
-          <div className={`text-xs mt-0.5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+          <div className={`text-xs mt-0.5 ${darkMode ? 'text-[#6A7A8A]' : 'text-ink-300'}`}>
             Total:{' '}
             {costsVisible
-              ? <span className={darkMode ? 'text-green-400' : 'text-forest'}>${grandTotal.toFixed(2)}</span>
-              : <span>🔒 hidden</span>}
+              ? <span className="text-teal">${grandTotal.toFixed(2)}</span>
+              : <span className={darkMode ? 'text-[#6A7A8A]' : 'text-ink-300'}>hidden</span>}
           </div>
         </div>
         <button
           onClick={costsVisible ? () => setCostsVisible(false) : handleShowCosts}
-          className={`px-3 py-2 rounded-lg text-xs font-bold transition-colors ${
+          className={`px-3 py-2 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 ${
             costsVisible
-              ? darkMode ? 'bg-burgundy/20 text-red-300 hover:bg-burgundy/30' : 'bg-burgundy/10 text-burgundy hover:bg-burgundy/20'
-              : darkMode ? 'bg-forest/20 text-green-300 hover:bg-forest/30' : 'bg-forest/10 text-forest hover:bg-forest/20'
+              ? darkMode ? 'bg-amber/20 text-amber hover:bg-amber/30' : 'bg-amber-tint text-amber-dark hover:bg-amber-border/30'
+              : darkMode ? 'bg-navy-light/10 text-navy-light hover:bg-navy-light/20' : 'bg-navy-light/10 text-navy-light hover:bg-navy-light/20'
           }`}
         >
-          {costsVisible ? '🔓 Hide costs' : '🔒 Show costs'}
+          {costsVisible
+            ? <><Unlock size={12} strokeWidth={2} /> Hide costs</>
+            : <><Lock size={12} strokeWidth={2} /> Show costs</>}
         </button>
       </div>
 
       {/* Store sections */}
       {relevantStoreIds.length === 0 ? (
-        <div className={`text-center py-10 text-sm ${darkMode ? 'text-gray-600' : 'text-gray-400'} italic`}>
+        <div className={`text-center py-10 text-sm italic ${darkMode ? 'text-[#6A7A8A]' : 'text-ink-300'}`}>
           Mark a store as visited, then come back here to log your purchases.
         </div>
       ) : (

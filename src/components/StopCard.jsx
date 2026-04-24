@@ -1,4 +1,8 @@
 import { useState } from 'react';
+import {
+  Check, Navigation, Footprints, Info, Clock, MapPin,
+  Pencil, Undo2, SkipForward,
+} from 'lucide-react';
 import { getStoreById } from '../data/stores';
 
 export default function StopCard({
@@ -30,22 +34,20 @@ export default function StopCard({
     onSetNote(stop.storeId, e.target.value);
   };
 
-  const cardClass = `stop-card rounded-xl border-2 p-4 transition-all duration-200 ${
+  const cardClass = `stop-card rounded-xl p-4 transition-all duration-200 ${
     isVisited
       ? darkMode
-        ? 'border-green-700 bg-green-900/20'
-        : 'border-green-400 bg-green-50'
+        ? 'border-2 border-teal bg-teal/10'
+        : 'border-2 border-teal bg-teal-tint'
       : isSkipped
         ? darkMode
-          ? 'border-gray-600 bg-gray-800/50 opacity-60'
-          : 'border-gray-300 bg-gray-100 opacity-60'
+          ? 'border border-navy-border bg-navy-deep/50 opacity-50'
+          : 'border border-cream-border bg-cream-page opacity-50'
         : isCurrent
-          ? darkMode
-            ? 'border-burgundy bg-burgundy/10 shadow-md'
-            : 'border-burgundy bg-burgundy/5 shadow-md'
+          ? 'border-2 border-amber bg-amber-tint shadow-md'
           : darkMode
-            ? 'border-gray-700 bg-gray-800'
-            : 'border-cream-200 bg-white'
+            ? 'border border-navy-border bg-navy-deep'
+            : 'border border-cream-border bg-cream-white'
   }`;
 
   return (
@@ -55,16 +57,16 @@ export default function StopCard({
         {/* Stop number badge */}
         <div className={`flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold ${
           isVisited
-            ? 'bg-green-500 text-white'
+            ? 'bg-teal text-white'
             : isSkipped
-              ? darkMode ? 'bg-gray-600 text-gray-300' : 'bg-gray-300 text-gray-500'
+              ? darkMode ? 'bg-navy-border text-[#6A7A8A]' : 'bg-cream-border text-ink-500'
               : isCurrent
-                ? 'bg-burgundy text-white animate-pulse'
+                ? 'bg-amber text-white'
                 : darkMode
-                  ? 'bg-gray-700 text-gray-300'
-                  : 'bg-cream-200 text-forest'
+                  ? 'bg-navy-raised text-navy-light'
+                  : 'bg-cream-page text-navy-light'
         }`}>
-          {isVisited ? '✓' : stopNumber}
+          {isVisited ? <Check size={16} strokeWidth={2.5} /> : stopNumber}
         </div>
 
         {/* Store info */}
@@ -72,65 +74,70 @@ export default function StopCard({
           <div className="flex items-center gap-2 flex-wrap">
             <span className={`font-bold text-base leading-tight ${
               isVisited
-                ? darkMode ? 'text-green-400 line-through' : 'text-green-700 line-through'
-                : darkMode ? 'text-gray-100' : 'text-gray-900'
+                ? 'line-through text-teal/60'
+                : darkMode ? 'text-cream-border' : 'text-ink-900'
             }`}>
               {store.name}
             </span>
             {store.new2026 && (
-              <span className="bg-forest/10 text-forest text-xs px-1.5 py-0.5 rounded-full font-semibold whitespace-nowrap dark:bg-forest/20 dark:text-green-300">
+              <span className="bg-navy-light/10 text-navy-light text-xs px-1.5 py-0.5 rounded-full font-semibold whitespace-nowrap">
                 NEW
               </span>
             )}
             {store.thirdPlace && (
-              <span className="bg-burgundy/10 text-burgundy text-xs px-1.5 py-0.5 rounded-full font-semibold whitespace-nowrap dark:bg-burgundy/20 dark:text-red-300">
+              <span className="bg-navy-darkest/10 text-navy text-xs px-1.5 py-0.5 rounded-full font-semibold whitespace-nowrap">
                 3P
               </span>
             )}
             {store.timeSensitive && (
-              <span className="bg-burgundy/10 text-burgundy text-xs px-1.5 py-0.5 rounded-full font-bold whitespace-nowrap dark:bg-burgundy/20 dark:text-red-300">
-                ⏰ closes early
+              <span className="inline-flex items-center gap-0.5 bg-amber-tint text-amber border border-amber-border text-xs px-1.5 py-0.5 rounded-full font-bold whitespace-nowrap">
+                <Clock size={9} strokeWidth={2} />
+                closes early
               </span>
             )}
             {stop.lastStop && (
-              <span className="bg-amber-100 text-amber-800 text-xs px-1.5 py-0.5 rounded-full font-bold whitespace-nowrap dark:bg-amber-900/40 dark:text-amber-300">
+              <span className="bg-gold-tint text-amber text-xs px-1.5 py-0.5 rounded-full font-bold whitespace-nowrap">
                 last stop
               </span>
             )}
           </div>
 
-          <div className={`text-xs mt-0.5 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+          <div className={`text-xs mt-0.5 ${darkMode ? 'text-[#6A7A8A]' : 'text-ink-500'}`}>
             {store.address}
           </div>
 
-          <div className={`flex flex-wrap gap-x-4 gap-y-1 mt-1.5 text-xs`}>
-            <span className={darkMode ? 'text-gray-300' : 'text-gray-700'}>
+          <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1.5 text-xs">
+            <span className={darkMode ? 'text-cream-border' : 'text-ink-700'}>
               Arrive <strong>{stop.time}</strong>
             </span>
-            <span className={darkMode ? 'text-gray-400' : 'text-gray-500'}>
+            <span className={darkMode ? 'text-[#6A7A8A]' : 'text-ink-500'}>
               {hours}
             </span>
           </div>
 
           {stop.travelTime && (
-            <div className={`flex items-center gap-1 mt-1 text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-              <span>{stop.directionMode === 'walking' ? '🚶' : '🚗'}</span>
+            <div className={`flex items-center gap-1 mt-1 text-xs ${darkMode ? 'text-[#6A7A8A]' : 'text-ink-300'}`}>
+              {stop.directionMode === 'walking'
+                ? <Footprints size={12} strokeWidth={2} />
+                : <Navigation size={12} strokeWidth={2} />}
               <span>{stop.travelTime} from {stop.travelFrom}</span>
             </div>
           )}
 
           {store.notes && (
-            <div className={`mt-1.5 text-xs px-2 py-1 rounded-lg ${
+            <div className={`mt-1.5 text-xs px-2 py-1 rounded-lg flex items-start gap-1 ${
               store.timeSensitive
-                ? darkMode ? 'bg-red-900/30 text-red-300' : 'bg-red-50 text-red-700'
-                : darkMode ? 'bg-amber-900/20 text-amber-300' : 'bg-amber-50 text-amber-700'
+                ? darkMode ? 'bg-amber/10 text-amber' : 'bg-amber-tint text-amber-dark border border-amber-border/50'
+                : darkMode ? 'bg-navy-raised text-[#A8906A]' : 'bg-cream-page text-ink-700'
             }`}>
-              💡 {store.notes}
+              <Info size={11} strokeWidth={2} className="flex-shrink-0 mt-0.5" />
+              <span>{store.notes}</span>
             </div>
           )}
 
           {isCurrent && !isVisited && (
-            <div className="mt-1.5 inline-flex items-center gap-1 bg-burgundy text-white text-xs px-2 py-0.5 rounded-full font-semibold">
+            <div className="mt-1.5 inline-flex items-center gap-1 bg-amber text-white text-xs px-2 py-0.5 rounded-full font-semibold">
+              <MapPin size={10} strokeWidth={2} />
               current stop
             </div>
           )}
@@ -144,10 +151,10 @@ export default function StopCard({
             value={noteText}
             onChange={handleNoteChange}
             placeholder="Add a note about this store..."
-            className={`w-full text-sm p-2 rounded-lg border resize-none h-16 focus:outline-none focus:ring-2 focus:ring-forest ${
+            className={`w-full text-sm p-2 rounded-lg border resize-none h-16 focus:outline-none focus:ring-2 focus:ring-navy-light ${
               darkMode
-                ? 'bg-gray-700 border-gray-600 text-gray-200 placeholder-gray-500 focus:ring-green-600'
-                : 'bg-cream-50 border-gray-200 text-gray-800 placeholder-gray-400'
+                ? 'bg-navy-raised border-navy-border text-cream-border placeholder-[#6A7A8A]'
+                : 'bg-cream-page border-cream-border text-ink-900 placeholder-ink-300'
             }`}
           />
         </div>
@@ -163,8 +170,8 @@ export default function StopCard({
             rel="noopener noreferrer"
             className={`px-3 py-2 rounded-lg text-xs font-medium border transition-colors ${
               darkMode
-                ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
-                : 'border-gray-200 text-gray-500 hover:bg-gray-50'
+                ? 'border-navy-border text-[#A8906A] hover:bg-navy-raised'
+                : 'border-cream-border text-ink-500 hover:bg-cream-page'
             }`}
           >
             Website
@@ -177,22 +184,25 @@ export default function StopCard({
             href={stop.directionUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-3 py-2 rounded-lg text-xs font-semibold text-white transition-colors bg-forest hover:bg-forest-light"
+            className="px-3 py-2 rounded-lg text-xs font-semibold text-white bg-navy-light hover:bg-navy-hover transition-colors flex items-center gap-1"
           >
-            {stop.directionMode === 'walking' ? '🚶 Walk' : '🚗 Drive'}
+            {stop.directionMode === 'walking'
+              ? <><Footprints size={12} strokeWidth={2} /> Walk</>
+              : <><Navigation size={12} strokeWidth={2} /> Drive</>}
           </a>
         )}
 
         {/* Notes toggle */}
         <button
           onClick={() => setShowNotes(!showNotes)}
-          className={`px-3 py-2 rounded-lg text-xs font-medium border transition-colors ${
+          className={`px-3 py-2 rounded-lg text-xs font-medium border transition-colors flex items-center gap-1 ${
             note
-              ? darkMode ? 'border-yellow-600 text-yellow-400 bg-yellow-900/20' : 'border-yellow-400 text-yellow-700 bg-yellow-50'
-              : darkMode ? 'border-gray-600 text-gray-400 hover:bg-gray-700' : 'border-gray-200 text-gray-500 hover:bg-gray-50'
+              ? darkMode ? 'border-amber-border text-amber bg-amber/10' : 'border-amber-border text-amber-dark bg-amber-tint'
+              : darkMode ? 'border-navy-border text-[#6A7A8A] hover:bg-navy-raised' : 'border-cream-border text-ink-500 hover:bg-cream-page'
           }`}
         >
-          {note ? '✎ Note' : '✎ Notes'}
+          <Pencil size={12} strokeWidth={2} />
+          {note ? 'Note' : 'Notes'}
         </button>
 
         {/* Skip/unskip */}
@@ -200,20 +210,22 @@ export default function StopCard({
           isSkipped ? (
             <button
               onClick={() => onUnskip(stop.storeId)}
-              className={`px-3 py-2 rounded-lg text-xs font-medium border transition-colors ${
-                darkMode ? 'border-gray-500 text-gray-300 hover:bg-gray-700' : 'border-gray-400 text-gray-600 hover:bg-gray-50'
+              className={`px-3 py-2 rounded-lg text-xs font-medium border transition-colors flex items-center gap-1 ${
+                darkMode ? 'border-navy-border text-[#A8906A] hover:bg-navy-raised' : 'border-cream-border text-ink-500 hover:bg-cream-page'
               }`}
             >
-              ↩ Unskip
+              <Undo2 size={12} strokeWidth={2} />
+              Unskip
             </button>
           ) : (
             <button
               onClick={() => onSkip(stop.storeId)}
-              className={`px-3 py-2 rounded-lg text-xs font-medium border transition-colors ${
-                darkMode ? 'border-orange-700 text-orange-400 hover:bg-orange-900/20' : 'border-orange-300 text-orange-600 hover:bg-orange-50'
+              className={`px-3 py-2 rounded-lg text-xs font-medium border transition-colors flex items-center gap-1 ${
+                darkMode ? 'border-amber-border/50 text-amber hover:bg-amber/10' : 'border-amber-border text-amber-dark hover:bg-amber-tint'
               }`}
             >
-              ⏭ Skip
+              <SkipForward size={12} strokeWidth={2} />
+              Skip
             </button>
           )
         )}
@@ -223,22 +235,23 @@ export default function StopCard({
           {isVisited ? (
             <button
               onClick={() => onUnmarkVisited(stop.storeId)}
-              className={`min-w-[44px] min-h-[44px] px-4 py-2 rounded-lg text-sm font-bold border-2 transition-colors ${
+              className={`min-w-[44px] min-h-[44px] px-4 py-2 rounded-lg text-sm font-bold border-2 transition-colors flex items-center gap-1 ${
                 darkMode
-                  ? 'border-green-600 text-green-400 hover:bg-green-900/30'
-                  : 'border-green-500 text-green-700 hover:bg-green-50'
+                  ? 'border-teal-border text-teal bg-teal/10 hover:bg-teal/20'
+                  : 'border-teal-border text-teal bg-teal-tint hover:bg-teal/10'
               }`}
             >
-              ✓ Visited
+              <Check size={14} strokeWidth={2.5} />
+              Visited
             </button>
           ) : (
             <button
               onClick={() => onMarkVisited(stop.storeId)}
               disabled={isSkipped}
-              className={`min-w-[44px] min-h-[44px] px-4 py-2 rounded-lg text-sm font-bold text-white transition-colors ${
+              className={`min-w-[44px] min-h-[44px] px-4 py-2 rounded-lg text-sm font-bold text-white transition-colors active:scale-[0.97] ${
                 isSkipped
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-forest hover:bg-forest-light active:scale-95'
+                  ? 'bg-ink-300 cursor-not-allowed'
+                  : 'bg-navy-light hover:bg-navy-hover'
               }`}
             >
               Mark Visited

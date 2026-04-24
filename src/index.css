@@ -3,13 +3,13 @@
 @tailwind utilities;
 
 :root {
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Figtree', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-.font-serif-display {
-  font-family: Georgia, 'Times New Roman', serif;
+.font-display {
+  font-family: 'Fraunces', Georgia, serif;
 }
 
 body {
@@ -26,14 +26,14 @@ body {
   background: #FDF8F0;
 }
 ::-webkit-scrollbar-thumb {
-  background: #2D5016;
+  background: #1B3A5C;
   border-radius: 4px;
 }
 .dark ::-webkit-scrollbar-track {
-  background: #1a1a1a;
+  background: #0E1A27;
 }
 .dark ::-webkit-scrollbar-thumb {
-  background: #3D6B1F;
+  background: #2860A0;
 }
 
 /* Leaflet custom overrides */
@@ -58,24 +58,24 @@ body {
 }
 
 .store-marker.visited {
-  background-color: #16a34a;
+  background-color: #1D6B4A;
 }
 
 .store-marker.current {
-  background-color: #dc2626;
+  background-color: #C4752A;
   animation: pulse 1.5s infinite;
 }
 
 .store-marker.upcoming-sat {
-  background-color: #2563eb;
+  background-color: #2860A0;
 }
 
 .store-marker.upcoming-sun {
-  background-color: #7c3aed;
+  background-color: #1B3A5C;
 }
 
 .store-marker.unplanned {
-  background-color: #9ca3af;
+  background-color: #A89280;
 }
 
 .store-marker.ferry {
@@ -89,7 +89,7 @@ body {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background-color: #8B2035;
+  background-color: #1B3A5C;
   border: 3px solid white;
   box-shadow: 0 2px 8px rgba(0,0,0,0.4);
   font-size: 18px;
@@ -97,7 +97,7 @@ body {
 
 @keyframes pulse {
   0%, 100% { transform: scale(1); box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
-  50% { transform: scale(1.15); box-shadow: 0 4px 16px rgba(220,38,38,0.6); }
+  50% { transform: scale(1.15); box-shadow: 0 4px 16px rgba(196,117,42,0.6); }
 }
 
 /* Confetti animation */
@@ -123,14 +123,14 @@ body {
 
 /* Tab active state */
 .tab-active {
-  border-bottom: 3px solid #2D5016;
-  color: #2D5016;
+  border-bottom: 3px solid #2860A0;
+  color: #2860A0;
   font-weight: 600;
 }
 
 .dark .tab-active {
-  border-bottom-color: #3D6B1F;
-  color: #6abf4b;
+  border-bottom-color: #2860A0;
+  color: #2860A0;
 }
 
 /* Card hover */
