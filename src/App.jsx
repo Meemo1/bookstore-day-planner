@@ -200,19 +200,22 @@ export default function App() {
   const wishlistFound = (wishlists.emily?.filter(i => i.gotIt).length || 0) + (wishlists.iris?.filter(i => i.gotIt).length || 0);
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${
-      darkMode ? 'bg-navy-darkest text-cream-border' : 'bg-cream text-ink-900'
-    }`}>
-      {/* Tiled IBD logo background */}
-      <div
-        className="fixed inset-0 z-0 pointer-events-none"
-        style={{
-          backgroundImage: 'url(/ibd-logo-2026.png)',
-          backgroundRepeat: 'repeat',
-          backgroundSize: '180px',
-          opacity: 0.13,
-        }}
-      />
+    <div
+      className={`min-h-screen transition-colors duration-300 ${
+        darkMode ? 'text-cream-border' : 'text-ink-900'
+      }`}
+      style={darkMode ? {
+        backgroundColor: '#0E1A27',
+        backgroundImage: 'linear-gradient(rgba(14,26,39,0.93),rgba(14,26,39,0.93)),url(/ibd-logo-2026.png)',
+        backgroundRepeat: 'no-repeat,repeat',
+        backgroundSize: 'cover,180px',
+      } : {
+        backgroundColor: '#FDF8F0',
+        backgroundImage: 'linear-gradient(rgba(253,248,240,0.93),rgba(253,248,240,0.93)),url(/ibd-logo-2026.png)',
+        backgroundRepeat: 'no-repeat,repeat',
+        backgroundSize: 'cover,180px',
+      }}
+    >
       {/* Compact sticky header */}
       <header className={`sticky top-0 z-40 shadow-sm transition-colors duration-300 ${
         darkMode ? 'bg-navy-deep border-b border-navy-border' : 'bg-navy'
