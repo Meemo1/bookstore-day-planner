@@ -11,7 +11,7 @@ function StoreThumbnail({ storeId, name, isVisited, isCurrent, darkMode }) {
   const ring = isVisited ? 'ring-2 ring-teal/40' : isCurrent ? 'ring-2 ring-amber/40' : '';
   const bg = darkMode ? 'bg-navy-raised' : 'bg-white';
   return (
-    <div className={`flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden ${ring} ${bg} border border-cream-border/50 flex items-center justify-center p-1`}>
+    <div className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden ${ring} ${bg} border border-cream-border/50 flex items-center justify-center p-1.5`}>
       <img
         src={`/store-images/${storeId}.png`}
         alt={name}
