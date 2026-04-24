@@ -41,8 +41,8 @@ export default function StopCard({
           : 'border-gray-300 bg-gray-100 opacity-60'
         : isCurrent
           ? darkMode
-            ? 'border-red-500 bg-red-900/20 shadow-lg shadow-red-900/30'
-            : 'border-red-400 bg-red-50 shadow-lg shadow-red-100'
+            ? 'border-burgundy bg-burgundy/10 shadow-md'
+            : 'border-burgundy bg-burgundy/5 shadow-md'
           : darkMode
             ? 'border-gray-700 bg-gray-800'
             : 'border-cream-200 bg-white'
@@ -59,7 +59,7 @@ export default function StopCard({
             : isSkipped
               ? darkMode ? 'bg-gray-600 text-gray-300' : 'bg-gray-300 text-gray-500'
               : isCurrent
-                ? 'bg-red-500 text-white animate-pulse'
+                ? 'bg-burgundy text-white animate-pulse'
                 : darkMode
                   ? 'bg-gray-700 text-gray-300'
                   : 'bg-cream-200 text-forest'
@@ -78,23 +78,23 @@ export default function StopCard({
               {store.name}
             </span>
             {store.new2026 && (
-              <span className="bg-emerald-100 text-emerald-800 text-xs px-1.5 py-0.5 rounded-full font-semibold whitespace-nowrap dark:bg-emerald-900/40 dark:text-emerald-300">
-                ✨ NEW
+              <span className="bg-forest/10 text-forest text-xs px-1.5 py-0.5 rounded-full font-semibold whitespace-nowrap dark:bg-forest/20 dark:text-green-300">
+                NEW
               </span>
             )}
             {store.thirdPlace && (
-              <span className="bg-purple-100 text-purple-800 text-xs px-1.5 py-0.5 rounded-full font-semibold whitespace-nowrap dark:bg-purple-900/40 dark:text-purple-300">
+              <span className="bg-burgundy/10 text-burgundy text-xs px-1.5 py-0.5 rounded-full font-semibold whitespace-nowrap dark:bg-burgundy/20 dark:text-red-300">
                 3P
               </span>
             )}
             {store.timeSensitive && (
-              <span className="bg-red-100 text-red-700 text-xs px-1.5 py-0.5 rounded-full font-bold whitespace-nowrap dark:bg-red-900/40 dark:text-red-300 animate-pulse">
-                ⏰ CLOSES EARLY
+              <span className="bg-burgundy/10 text-burgundy text-xs px-1.5 py-0.5 rounded-full font-bold whitespace-nowrap dark:bg-burgundy/20 dark:text-red-300">
+                ⏰ closes early
               </span>
             )}
             {stop.lastStop && (
-              <span className="bg-yellow-100 text-yellow-800 text-xs px-1.5 py-0.5 rounded-full font-bold whitespace-nowrap dark:bg-yellow-900/40 dark:text-yellow-300">
-                🏁 LAST STOP
+              <span className="bg-amber-100 text-amber-800 text-xs px-1.5 py-0.5 rounded-full font-bold whitespace-nowrap dark:bg-amber-900/40 dark:text-amber-300">
+                last stop
               </span>
             )}
           </div>
@@ -130,8 +130,8 @@ export default function StopCard({
           )}
 
           {isCurrent && !isVisited && (
-            <div className="mt-1.5 inline-flex items-center gap-1 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 text-xs px-2 py-0.5 rounded-full font-semibold animate-pulse">
-              📍 YOU ARE HERE
+            <div className="mt-1.5 inline-flex items-center gap-1 bg-burgundy text-white text-xs px-2 py-0.5 rounded-full font-semibold">
+              current stop
             </div>
           )}
         </div>
@@ -177,13 +177,9 @@ export default function StopCard({
             href={stop.directionUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className={`px-3 py-2 rounded-lg text-xs font-semibold text-white transition-colors ${
-              stop.directionMode === 'walking'
-                ? 'bg-blue-600 hover:bg-blue-700'
-                : 'bg-forest hover:bg-forest-light'
-            }`}
+            className="px-3 py-2 rounded-lg text-xs font-semibold text-white transition-colors bg-forest hover:bg-forest-light"
           >
-            {stop.directionMode === 'walking' ? '🚶 Directions' : '🚗 Directions'}
+            {stop.directionMode === 'walking' ? '🚶 Walk' : '🚗 Drive'}
           </a>
         )}
 

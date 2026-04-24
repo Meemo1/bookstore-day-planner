@@ -26,37 +26,49 @@ function LiveClock({ darkMode }) {
   );
 }
 
-function ScheduleDelta({ stop, visitedStores, darkMode }) {
+const TRIP_SAT = new Date(2026, 3, 25);
+const TRIP_SUN = new Date(2026, 3, 26);
+
+function isTripDay(day) {
+  const now = new Date();
+  const d = day === 'sunday' ? TRIP_SUN : TRIP_SAT;
+  return now.getFullYear() === d.getFullYear() &&
+    now.getMonth() === d.getMonth() &&
+    now.getDate() === d.getDate();
+}
+
+function ScheduleDelta({ stop, activeDay, darkMode }) {
   const [delta, setDelta] = useState(null);
 
   useEffect(() => {
+    if (!isTripDay(activeDay)) return;
     const update = () => {
       const now = new Date();
       const currentMins = now.getHours() * 60 + now.getMinutes();
-      const diff = currentMins - stop.timeMinutes;
-      setDelta(diff);
+      setDelta(currentMins - stop.timeMinutes);
     };
     update();
     const interval = setInterval(update, 30000);
     return () => clearInterval(interval);
-  }, [stop.timeMinutes]);
+  }, [stop.timeMinutes, activeDay]);
 
   if (delta === null) return null;
   if (Math.abs(delta) < 3) return (
-    <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+    <span className="text-xs px-2 py-0.5 rounded-full bg-forest/10 text-forest dark:bg-forest/20 dark:text-green-400">
       On time
     </span>
   );
   if (delta > 0) return (
     <span className={`text-xs px-2 py-0.5 rounded-full ${
-      delta > 30 ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
-      'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+      delta > 30
+        ? 'bg-burgundy/10 text-burgundy dark:bg-burgundy/20 dark:text-red-400'
+        : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
     }`}>
-      {delta > 0 ? `+${delta}` : delta} min
+      +{delta} min
     </span>
   );
   return (
-    <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+    <span className="text-xs px-2 py-0.5 rounded-full bg-cream-200 text-forest dark:bg-forest/20 dark:text-green-400">
       {delta} min (early!)
     </span>
   );
@@ -146,22 +158,22 @@ function ContingencyTab({ visitedStores, skippedStores, contingencyStores, notes
     <div className="space-y-4">
       {skipped.length > 0 && (
         <div>
-          <h3 className={`text-sm font-bold uppercase tracking-wider mb-2 ${darkMode ? 'text-orange-400' : 'text-orange-700'}`}>
+          <h3 className={`text-sm font-bold uppercase tracking-wider mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
             Skipped Stores ({skipped.length})
           </h3>
           <div className="space-y-2">
             {skipped.map(store => (
-              <div key={store.id} className={`rounded-xl p-4 border ${darkMode ? 'border-orange-800 bg-orange-900/10' : 'border-orange-200 bg-orange-50'}`}>
+              <div key={store.id} className={`rounded-xl p-4 border ${darkMode ? 'border-gray-700 bg-gray-800' : 'border-cream-200 bg-cream-50'}`}>
                 <div className="flex items-center justify-between gap-2">
                   <div>
                     <div className={`font-semibold ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
                       {store.name}
                     </div>
                     <div className={`text-xs mt-0.5 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                      📍 {store.address}
+                      {store.address}
                     </div>
                     <div className={`text-xs mt-1 ${darkMode ? 'text-gray-500' : 'text-gray-600'}`}>
-                      🏪 Sat: {store.hours.sat_ibd} | Sun: {store.hours.sun}
+                      Sat: {store.hours.sat_ibd} · Sun: {store.hours.sun}
                     </div>
                   </div>
                   <div className="flex gap-2">
@@ -187,21 +199,21 @@ function ContingencyTab({ visitedStores, skippedStores, contingencyStores, notes
           You only need to visit ONE Third Place Books location. Third Place Ravenna is on the Saturday route.
         </p>
         {stores.filter(s => s.thirdPlace && s.id !== 'thirdplaceravenna').map(store => (
-          <div key={store.id} className={`rounded-xl p-4 border mb-2 ${darkMode ? 'border-purple-800 bg-purple-900/10' : 'border-purple-200 bg-purple-50'}`}>
+          <div key={store.id} className={`rounded-xl p-4 border mb-2 ${darkMode ? 'border-gray-700 bg-gray-800' : 'border-cream-200 bg-cream-50'}`}>
             <div className="flex items-center justify-between gap-2">
               <div>
                 <div className={`font-semibold ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
                   {store.name}
                 </div>
                 <div className={`text-xs mt-0.5 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                  📍 {store.address}
+                  {store.address}
                 </div>
                 <div className={`text-xs mt-1 ${darkMode ? 'text-gray-500' : 'text-gray-600'}`}>
-                  🏪 Open daily: {store.hours.sat_ibd}
+                  Sat IBD: {store.hours.sat_ibd}
                 </div>
                 {store.notes && (
-                  <div className={`text-xs mt-1 italic ${darkMode ? 'text-purple-400' : 'text-purple-700'}`}>
-                    💡 {store.notes}
+                  <div className={`text-xs mt-1 italic ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                    {store.notes}
                   </div>
                 )}
               </div>
@@ -296,7 +308,7 @@ export default function ItineraryView({
                       Stop {storeCount}
                     </span>
                     {isCurrent && (
-                      <ScheduleDelta stop={stop} visitedStores={visitedStores} darkMode={darkMode} />
+                      <ScheduleDelta stop={stop} activeDay={activeDay} darkMode={darkMode} />
                     )}
                   </div>
                   <StopCard
@@ -317,7 +329,7 @@ export default function ItineraryView({
                 </div>
               );
             } else if (stop.type === 'ferry' || stop.type === 'ferry-warning' || stop.type === 'depart') {
-              return <FerryCard key={stop.id} stop={stop} darkMode={darkMode} />;
+              return <FerryCard key={stop.id} stop={stop} activeDay={activeDay} darkMode={darkMode} />;
             } else if (stop.type === 'meal') {
               return <MealCard key={stop.id} stop={stop} darkMode={darkMode} />;
             } else if (stop.type === 'transit') {

@@ -1,10 +1,9 @@
 import { useEffect, useMemo } from 'react';
-import { MapContainer, TileLayer, CircleMarker, Polyline, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Polyline, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { stores, HOME } from '../data/stores';
-import { saturdayStoreIds, sundayStoreIds, saturdayPolyline, sundayPolyline, ferryRoutes } from '../data/routes';
+import { saturdayRoute, sundayRoute, saturdayStoreIds, sundayStoreIds, saturdayPolyline, sundayPolyline, ferryRoutes } from '../data/routes';
 
-// Fix default leaflet icon issue in Vite
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -12,31 +11,77 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
-function getStoreColor(store, visitedStores, activeDay, saturdayStoreIds, sundayStoreIds) {
-  if (visitedStores.includes(store.id)) return '#16a34a'; // green
-  if (activeDay === 'saturday' && saturdayStoreIds.includes(store.id)) return '#2563eb'; // blue
-  if (activeDay === 'sunday' && sundayStoreIds.includes(store.id)) return '#7c3aed'; // purple
+// Precompute stop order per day
+const satOrder = {};
+let n = 0;
+saturdayRoute.forEach(s => { if (s.type === 'store') { n++; satOrder[s.storeId] = n; } });
+const sunOrder = {};
+n = 0;
+sundayRoute.forEach(s => { if (s.type === 'store') { n++; sunOrder[s.storeId] = n; } });
+
+function getStoreColor(store, visitedStores, activeDay) {
+  if (visitedStores.includes(store.id)) return '#16a34a';
+  if (activeDay === 'saturday' && saturdayStoreIds.includes(store.id)) return '#2D5016';
+  if (activeDay === 'sunday' && sundayStoreIds.includes(store.id)) return '#8B2035';
   if (activeDay === 'both') {
-    if (saturdayStoreIds.includes(store.id)) return '#2563eb';
-    if (sundayStoreIds.includes(store.id)) return '#7c3aed';
+    if (saturdayStoreIds.includes(store.id)) return '#2D5016';
+    if (sundayStoreIds.includes(store.id)) return '#8B2035';
   }
-  return '#9ca3af'; // gray - unplanned
+  return '#9ca3af';
 }
 
-function HomeMarker({ darkMode }) {
+function makeMarkerIcon(label, color) {
+  return L.divIcon({
+    className: '',
+    html: `<div style="
+      width:28px; height:28px; border-radius:50%;
+      border:2px solid white; box-shadow:0 1px 4px rgba(0,0,0,0.4);
+      display:flex; align-items:center; justify-content:center;
+      font-size:10px; font-weight:700; color:white; line-height:1;
+      background:${color};
+    ">${label}</div>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
+    popupAnchor: [0, -16],
+  });
+}
+
+function FitBounds({ activeDay }) {
   const map = useMap();
 
   useEffect(() => {
-    const marker = L.marker([HOME.lat, HOME.lng], {
-      icon: L.divIcon({
-        className: '',
-        html: `<div style="width:36px;height:36px;border-radius:50%;background:#8B2035;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;">🏠</div>`,
-        iconSize: [36, 36],
-        iconAnchor: [18, 18],
-      }),
+    const filtered = stores.filter(s => {
+      if (activeDay === 'saturday') return saturdayStoreIds.includes(s.id);
+      if (activeDay === 'sunday') return sundayStoreIds.includes(s.id);
+      return true;
     });
+    if (filtered.length === 0) return;
+    const bounds = filtered.map(s => [s.lat, s.lng]);
+    map.fitBounds(bounds, { padding: [30, 30] });
+  }, [activeDay, map]);
+
+  return null;
+}
+
+function HomeMarker() {
+  const map = useMap();
+
+  useEffect(() => {
+    const icon = L.divIcon({
+      className: '',
+      html: `<div style="
+        width:32px; height:32px; border-radius:50%;
+        background:#6B1828; border:2px solid white;
+        box-shadow:0 2px 8px rgba(0,0,0,0.4);
+        display:flex; align-items:center; justify-content:center;
+        font-size:16px;
+      ">🏠</div>`,
+      iconSize: [32, 32],
+      iconAnchor: [16, 16],
+    });
+    const marker = L.marker([HOME.lat, HOME.lng], { icon });
     marker.addTo(map);
-    marker.bindPopup(`<b>Home</b><br>${HOME.address}`);
+    marker.bindPopup(`<strong style="color:#2D5016">Home</strong><br><span style="color:#6b7280;font-size:12px">${HOME.address}</span>`);
     return () => marker.remove();
   }, [map]);
 
@@ -50,12 +95,7 @@ function FerryRoutes() {
         <Polyline
           key={route.id}
           positions={route.coords}
-          pathOptions={{
-            color: '#0891b2',
-            weight: 3,
-            dashArray: '10, 8',
-            opacity: 0.8,
-          }}
+          pathOptions={{ color: '#B5763A', weight: 3, dashArray: '10, 8', opacity: 0.8 }}
         />
       ))}
     </>
@@ -82,82 +122,56 @@ export default function MapView({ visitedStores, activeDay, darkMode }) {
         style={{ height: '500px', width: '100%', borderRadius: '12px' }}
         className="z-0"
       >
-        <TileLayer
-          attribution={attribution}
-          url={mapStyle}
-        />
+        <TileLayer attribution={attribution} url={mapStyle} />
+        <FitBounds activeDay={activeDay} />
 
-        {/* Saturday route polyline */}
         {(activeDay === 'saturday' || activeDay === 'both') && (
-          <Polyline
-            positions={satLine}
-            pathOptions={{ color: '#2563eb', weight: 2.5, opacity: 0.7 }}
-          />
+          <Polyline positions={satLine} pathOptions={{ color: '#2D5016', weight: 2.5, opacity: 0.7 }} />
         )}
-
-        {/* Sunday route polyline */}
         {(activeDay === 'sunday' || activeDay === 'both') && (
-          <Polyline
-            positions={sunLine}
-            pathOptions={{ color: '#7c3aed', weight: 2.5, opacity: 0.7 }}
-          />
+          <Polyline positions={sunLine} pathOptions={{ color: '#8B2035', weight: 2.5, opacity: 0.7 }} />
         )}
 
-        {/* Ferry routes */}
         <FerryRoutes />
+        <HomeMarker />
 
-        {/* Home marker */}
-        <HomeMarker darkMode={darkMode} />
-
-        {/* Store markers */}
         {stores.map(store => {
-          const color = getStoreColor(store, visitedStores, activeDay, saturdayStoreIds, sundayStoreIds);
+          const color = getStoreColor(store, visitedStores, activeDay);
           const isVisited = visitedStores.includes(store.id);
-          const radius = isVisited ? 10 : 9;
 
-          // Skip contingency (third place duplicates) - show them gray
+          const stopNum = activeDay === 'saturday' ? satOrder[store.id] :
+            activeDay === 'sunday' ? sunOrder[store.id] :
+            satOrder[store.id] || sunOrder[store.id];
+
+          const label = isVisited ? '✓' : (stopNum ? String(stopNum) : '·');
+          const icon = makeMarkerIcon(label, color);
+
           return (
-            <CircleMarker
-              key={store.id}
-              center={[store.lat, store.lng]}
-              radius={radius}
-              pathOptions={{
-                color: 'white',
-                weight: 2,
-                fillColor: color,
-                fillOpacity: 0.95,
-              }}
-            >
+            <Marker key={store.id} position={[store.lat, store.lng]} icon={icon}>
               <Popup>
-                <div style={{ fontFamily: 'Georgia, serif', minWidth: '160px' }}>
-                  <strong style={{ fontSize: '14px' }}>{store.name}</strong>
-                  {store.new2026 && (
-                    <span style={{ marginLeft: '6px', background: '#d1fae5', color: '#065f46', fontSize: '10px', padding: '1px 6px', borderRadius: '9999px' }}>
-                      NEW 2026
-                    </span>
-                  )}
-                  <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
-                    📍 {store.address}
+                <div style={{ fontFamily: 'Inter, system-ui, sans-serif', minWidth: '160px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                    <strong style={{ fontSize: '14px', color: '#2D5016' }}>{store.name}</strong>
+                    {store.new2026 && (
+                      <span style={{ background: '#2D5016', color: 'white', fontSize: '9px', padding: '1px 5px', borderRadius: '9999px' }}>
+                        NEW
+                      </span>
+                    )}
                   </div>
-                  <div style={{ fontSize: '12px', marginTop: '4px' }}>
-                    <strong>Sat IBD:</strong> {store.hours.sat_ibd}
-                  </div>
-                  <div style={{ fontSize: '12px' }}>
+                  <div style={{ fontSize: '12px', color: '#6b7280' }}>{store.address}</div>
+                  <div style={{ fontSize: '12px', color: '#374151', marginTop: '4px' }}>
+                    <strong>Sat:</strong> {store.hours.sat_ibd}
+                    {' · '}
                     <strong>Sun:</strong> {store.hours.sun}
                   </div>
-                  {store.region && (
-                    <div style={{ fontSize: '11px', color: '#888', marginTop: '2px' }}>
-                      {store.region}
-                    </div>
-                  )}
                   {store.notes && (
-                    <div style={{ fontSize: '11px', color: '#b45309', marginTop: '4px', background: '#fef3c7', padding: '3px 6px', borderRadius: '4px' }}>
-                      ⚠️ {store.notes}
+                    <div style={{ fontSize: '11px', color: '#8B2035', marginTop: '4px', background: '#FDF8F0', padding: '3px 6px', borderRadius: '4px', border: '1px solid #e8c9d0' }}>
+                      {store.notes}
                     </div>
                   )}
                   {isVisited && (
-                    <div style={{ marginTop: '6px', color: '#16a34a', fontWeight: 'bold', fontSize: '12px' }}>
-                      ✓ VISITED!
+                    <div style={{ marginTop: '6px', color: '#2D5016', fontWeight: 'bold', fontSize: '12px' }}>
+                      ✓ Visited
                     </div>
                   )}
                   {store.website && (
@@ -165,29 +179,29 @@ export default function MapView({ visitedStores, activeDay, darkMode }) {
                       href={`https://${store.website}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      style={{ display: 'block', marginTop: '6px', fontSize: '11px', color: '#2563eb' }}
+                      style={{ display: 'block', marginTop: '6px', fontSize: '11px', color: '#2D5016' }}
                     >
-                      🌐 {store.website}
+                      {store.website}
                     </a>
                   )}
                 </div>
               </Popup>
-            </CircleMarker>
+            </Marker>
           );
         })}
       </MapContainer>
 
-      {/* Map Legend */}
+      {/* Legend */}
       <div className={`absolute bottom-4 left-4 z-10 rounded-lg p-3 shadow-lg text-xs ${
         darkMode ? 'bg-gray-800/95 text-gray-200' : 'bg-white/95 text-gray-700'
       }`}>
         <div className="font-semibold mb-1.5">Legend</div>
         {[
           { color: '#16a34a', label: 'Visited' },
-          { color: '#2563eb', label: 'Saturday' },
-          { color: '#7c3aed', label: 'Sunday' },
-          { color: '#9ca3af', label: 'Contingency' },
-          { color: '#8B2035', label: 'Home' },
+          { color: '#2D5016', label: 'Saturday' },
+          { color: '#8B2035', label: 'Sunday' },
+          { color: '#9ca3af', label: 'Not on route' },
+          { color: '#6B1828', label: 'Home' },
         ].map(({ color, label }) => (
           <div key={label} className="flex items-center gap-2 mb-1">
             <div style={{ width: 12, height: 12, borderRadius: '50%', background: color, border: '1.5px solid white', boxShadow: '0 1px 3px rgba(0,0,0,0.3)' }} />
@@ -195,22 +209,17 @@ export default function MapView({ visitedStores, activeDay, darkMode }) {
           </div>
         ))}
         <div className="flex items-center gap-2 mt-1">
-          <div style={{ width: 24, height: 3, background: '#2563eb', borderRadius: 2, opacity: 0.7 }} />
+          <div style={{ width: 24, height: 3, background: '#2D5016', borderRadius: 2, opacity: 0.7 }} />
           <span>Sat route</span>
         </div>
         <div className="flex items-center gap-2">
-          <div style={{ width: 24, height: 3, background: '#7c3aed', borderRadius: 2, opacity: 0.7 }} />
+          <div style={{ width: 24, height: 3, background: '#8B2035', borderRadius: 2, opacity: 0.7 }} />
           <span>Sun route</span>
         </div>
         <div className="flex items-center gap-2">
-          <div style={{ width: 24, height: 3, background: '#0891b2', borderRadius: 2, borderTop: '2px dashed #0891b2', opacity: 0.8 }} />
+          <div style={{ width: 24, height: 0, borderTop: '3px dashed #B5763A', opacity: 0.8 }} />
           <span>Ferry</span>
         </div>
-      </div>
-
-      {/* Day filter */}
-      <div className={`absolute top-4 right-4 z-10 flex flex-col gap-1.5 ${''}`}>
-        {/* shown via parent props */}
       </div>
     </div>
   );

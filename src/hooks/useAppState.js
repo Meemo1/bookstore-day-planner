@@ -9,7 +9,10 @@ const defaultState = {
   notes: {},
   activeDay: 'saturday',
   activeView: 'itinerary',
+  activeSection: 'route',
   darkMode: false,
+  wishlists: { emily: [], iris: [] },
+  purchases: {},
 };
 
 function loadState() {
@@ -31,15 +34,17 @@ function saveState(state) {
   }
 }
 
+function makeId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2);
+}
+
 export function useAppState() {
   const [state, setState] = useState(loadState);
 
-  // Persist to localStorage whenever state changes
   useEffect(() => {
     saveState(state);
   }, [state]);
 
-  // Apply dark mode class
   useEffect(() => {
     if (state.darkMode) {
       document.documentElement.classList.add('dark');
@@ -98,6 +103,10 @@ export function useAppState() {
     setState(prev => ({ ...prev, activeView: view }));
   }, []);
 
+  const setActiveSection = useCallback((section) => {
+    setState(prev => ({ ...prev, activeSection: section }));
+  }, []);
+
   const toggleDarkMode = useCallback(() => {
     setState(prev => ({ ...prev, darkMode: !prev.darkMode }));
   }, []);
@@ -106,12 +115,31 @@ export function useAppState() {
     setState(defaultState);
   }, []);
 
+  const importProgress = useCallback((jsonString) => {
+    try {
+      const data = JSON.parse(jsonString);
+      setState(prev => ({
+        ...prev,
+        visitedStores: Array.isArray(data.visitedStores) ? data.visitedStores : prev.visitedStores,
+        skippedStores: Array.isArray(data.skippedStores) ? data.skippedStores : prev.skippedStores,
+        notes: (data.notes && typeof data.notes === 'object') ? data.notes : prev.notes,
+        wishlists: (data.wishlists && typeof data.wishlists === 'object') ? data.wishlists : prev.wishlists,
+        purchases: (data.purchases && typeof data.purchases === 'object') ? data.purchases : prev.purchases,
+      }));
+      return true;
+    } catch {
+      return false;
+    }
+  }, []);
+
   const exportProgress = useCallback(() => {
     const data = {
       exported: new Date().toISOString(),
       visitedStores: state.visitedStores,
       skippedStores: state.skippedStores,
       notes: state.notes,
+      wishlists: state.wishlists,
+      purchases: state.purchases,
       totalVisited: state.visitedStores.length,
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -123,10 +151,62 @@ export function useAppState() {
     URL.revokeObjectURL(url);
   }, [state]);
 
-  // Compute total planned stores (33: all except 2 Third Place dupes)
+  // Wishlist actions
+  const addWishlistItem = useCallback((person, title, author) => {
+    setState(prev => ({
+      ...prev,
+      wishlists: {
+        ...prev.wishlists,
+        [person]: [...(prev.wishlists[person] || []), { id: makeId(), title, author, gotIt: false }],
+      },
+    }));
+  }, []);
+
+  const toggleWishlistItem = useCallback((person, id) => {
+    setState(prev => ({
+      ...prev,
+      wishlists: {
+        ...prev.wishlists,
+        [person]: prev.wishlists[person].map(item =>
+          item.id === id ? { ...item, gotIt: !item.gotIt } : item
+        ),
+      },
+    }));
+  }, []);
+
+  const removeWishlistItem = useCallback((person, id) => {
+    setState(prev => ({
+      ...prev,
+      wishlists: {
+        ...prev.wishlists,
+        [person]: prev.wishlists[person].filter(item => item.id !== id),
+      },
+    }));
+  }, []);
+
+  // Purchase actions
+  const addPurchase = useCallback((storeId, item, cost) => {
+    setState(prev => ({
+      ...prev,
+      purchases: {
+        ...prev.purchases,
+        [storeId]: [...(prev.purchases[storeId] || []), { id: makeId(), item, cost }],
+      },
+    }));
+  }, []);
+
+  const removePurchase = useCallback((storeId, id) => {
+    setState(prev => ({
+      ...prev,
+      purchases: {
+        ...prev.purchases,
+        [storeId]: (prev.purchases[storeId] || []).filter(p => p.id !== id),
+      },
+    }));
+  }, []);
+
   const totalPlanned = 33;
 
-  // Get next unvisited store for a given day's route
   const getNextStore = useCallback((dayRoute) => {
     const storeStops = dayRoute.filter(s => s.type === 'store');
     return storeStops.find(
@@ -143,9 +223,16 @@ export function useAppState() {
     setNote,
     setActiveDay,
     setActiveView,
+    setActiveSection,
     toggleDarkMode,
     resetAll,
+    importProgress,
     exportProgress,
+    addWishlistItem,
+    toggleWishlistItem,
+    removeWishlistItem,
+    addPurchase,
+    removePurchase,
     totalPlanned,
     getNextStore,
     saturdayStoreIds,
