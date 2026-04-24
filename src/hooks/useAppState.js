@@ -152,12 +152,12 @@ export function useAppState() {
   }, [state]);
 
   // Wishlist actions
-  const addWishlistItem = useCallback((person, title, author) => {
+  const addWishlistItem = useCallback((person, title, author, thumbnail) => {
     setState(prev => ({
       ...prev,
       wishlists: {
         ...prev.wishlists,
-        [person]: [...(prev.wishlists[person] || []), { id: makeId(), title, author, gotIt: false }],
+        [person]: [...(prev.wishlists[person] || []), { id: makeId(), title, author, gotIt: false, ...(thumbnail ? { thumbnail } : {}) }],
       },
     }));
   }, []);
