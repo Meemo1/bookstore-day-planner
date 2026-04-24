@@ -5,6 +5,30 @@ import {
 } from 'lucide-react';
 import { getStoreById } from '../data/stores';
 
+function StoreThumbnail({ storeId, name, isVisited, isCurrent, darkMode }) {
+  const [failed, setFailed] = useState(false);
+  if (failed) return null;
+  const ring = isVisited ? 'ring-2 ring-teal/40' : isCurrent ? 'ring-2 ring-amber/40' : '';
+  const bg = darkMode ? 'bg-navy-raised' : 'bg-white';
+  return (
+    <div className={`flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden ${ring} ${bg} border border-cream-border/50 flex items-center justify-center p-1`}>
+      <img
+        src={`/store-images/${storeId}.png`}
+        alt={name}
+        className="w-full h-full object-contain"
+        onError={(e) => {
+          // try .jpg fallback, then give up
+          if (e.target.src.endsWith('.png')) {
+            e.target.src = `/store-images/${storeId}.jpg`;
+          } else {
+            setFailed(true);
+          }
+        }}
+      />
+    </div>
+  );
+}
+
 export default function StopCard({
   stop,
   stopNumber,
@@ -70,7 +94,7 @@ export default function StopCard({
         </div>
 
         {/* Store info */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 pr-1">
           <div className="flex items-center gap-2 flex-wrap">
             <span className={`font-bold text-base leading-tight ${
               isVisited
@@ -142,6 +166,15 @@ export default function StopCard({
             </div>
           )}
         </div>
+
+        {/* Store thumbnail */}
+        <StoreThumbnail
+          storeId={stop.storeId}
+          name={store.name}
+          isVisited={isVisited}
+          isCurrent={isCurrent}
+          darkMode={darkMode}
+        />
       </div>
 
       {/* Notes section */}
