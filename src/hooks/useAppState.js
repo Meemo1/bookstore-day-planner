@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { saturdayStoreIds, sundayStoreIds } from '../data/routes';
 
 const STORAGE_KEY = 'ibd2026_planner';
+const SYNC_FIELDS = ['visitedStores', 'skippedStores', 'notes', 'wishlists', 'purchases'];
 
 const defaultState = {
   visitedStores: [],
@@ -38,13 +39,29 @@ function makeId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2);
 }
 
+function extractSyncPayload(state, syncedAt) {
+  const payload = { _syncedAt: syncedAt };
+  SYNC_FIELDS.forEach(f => { payload[f] = state[f]; });
+  return payload;
+}
+
 export function useAppState() {
   const [state, setState] = useState(loadState);
+  const syncTimerRef = useRef(null);
+  const lastWriteAtRef = useRef(0);
+  const latestStateRef = useRef(state);
 
+  // Keep ref in sync for use inside debounce timer
+  useEffect(() => {
+    latestStateRef.current = state;
+  });
+
+  // Persist to localStorage
   useEffect(() => {
     saveState(state);
   }, [state]);
 
+  // Dark mode class
   useEffect(() => {
     if (state.darkMode) {
       document.documentElement.classList.add('dark');
@@ -52,6 +69,59 @@ export function useAppState() {
       document.documentElement.classList.remove('dark');
     }
   }, [state.darkMode]);
+
+  // On mount: pull remote state and merge it in
+  useEffect(() => {
+    fetch('/api/state')
+      .then(r => r.ok ? r.json() : null)
+      .then(remote => {
+        if (!remote?._syncedAt) return;
+        lastWriteAtRef.current = new Date(remote._syncedAt).getTime();
+        setState(prev => ({
+          ...prev,
+          ...Object.fromEntries(SYNC_FIELDS.map(f => [f, remote[f] ?? prev[f]])),
+        }));
+      })
+      .catch(() => {});
+  }, []);
+
+  // Debounced write to API on any sync-field change
+  useEffect(() => {
+    clearTimeout(syncTimerRef.current);
+    syncTimerRef.current = setTimeout(() => {
+      const now = Date.now();
+      const payload = extractSyncPayload(latestStateRef.current, new Date(now).toISOString());
+      fetch('/api/state', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+        .then(() => { lastWriteAtRef.current = now; })
+        .catch(() => {});
+    }, 1000);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.visitedStores, state.skippedStores, state.notes, state.wishlists, state.purchases]);
+
+  // Poll every 15s — update local if remote is newer than our last write
+  useEffect(() => {
+    const poll = setInterval(() => {
+      fetch('/api/state')
+        .then(r => r.ok ? r.json() : null)
+        .then(remote => {
+          if (!remote?._syncedAt) return;
+          const remoteAt = new Date(remote._syncedAt).getTime();
+          if (remoteAt > lastWriteAtRef.current) {
+            lastWriteAtRef.current = remoteAt;
+            setState(prev => ({
+              ...prev,
+              ...Object.fromEntries(SYNC_FIELDS.map(f => [f, remote[f] ?? prev[f]])),
+            }));
+          }
+        })
+        .catch(() => {});
+    }, 15000);
+    return () => clearInterval(poll);
+  }, []);
 
   const markVisited = useCallback((storeId) => {
     setState(prev => {
@@ -151,7 +221,6 @@ export function useAppState() {
     URL.revokeObjectURL(url);
   }, [state]);
 
-  // Wishlist actions
   const addWishlistItem = useCallback((person, title, author, thumbnail) => {
     setState(prev => ({
       ...prev,
@@ -184,7 +253,6 @@ export function useAppState() {
     }));
   }, []);
 
-  // Purchase actions
   const addPurchase = useCallback((storeId, item, cost) => {
     setState(prev => ({
       ...prev,
