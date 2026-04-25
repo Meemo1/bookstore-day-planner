@@ -54,13 +54,6 @@ function WishlistItem({ item, onToggle, onRemove, darkMode, isLast }) {
             {item.author}
           </div>
         )}
-        {item.genre && (
-          <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-            darkMode ? 'bg-navy-raised text-[#A8906A]' : 'bg-amber-tint text-amber-dark'
-          }`}>
-            {item.genre}
-          </span>
-        )}
       </div>
       <button
         onClick={() => onRemove(item.id)}
@@ -83,7 +76,6 @@ export default function WishlistView({ wishlists, onAdd, onToggle, onRemove, dar
   const [thumbnail, setThumbnail] = useState('');
   const [loading, setLoading] = useState(false);
   const [kindleWarning, setKindleWarning] = useState(false);
-  const [genreFilter, setGenreFilter] = useState('All');
 
   const handleTitleChange = async (e) => {
     const val = e.target.value;
@@ -166,13 +158,27 @@ export default function WishlistView({ wishlists, onAdd, onToggle, onRemove, dar
 
   const allItems = wishlists[activePerson] || [];
 
-  const filterAndSort = (items) =>
-    items
-      .filter(i => genreFilter === 'All' || i.genre === genreFilter)
-      .sort((a, b) => a.title.localeCompare(b.title));
+  const groupByGenre = (items) => {
+    const byGenre = {};
+    const untagged = [];
+    items.forEach(item => {
+      if (item.genre) {
+        if (!byGenre[item.genre]) byGenre[item.genre] = [];
+        byGenre[item.genre].push(item);
+      } else {
+        untagged.push(item);
+      }
+    });
+    const sorted = (arr) => [...arr].sort((a, b) => a.title.localeCompare(b.title));
+    const groups = GENRES
+      .filter(g => byGenre[g]?.length)
+      .map(g => ({ genre: g, items: sorted(byGenre[g]) }));
+    if (untagged.length) groups.push({ genre: null, items: sorted(untagged) });
+    return groups;
+  };
 
-  const pending = filterAndSort(allItems.filter(i => !i.gotIt));
-  const found = filterAndSort(allItems.filter(i => i.gotIt));
+  const pendingGroups = groupByGenre(allItems.filter(i => !i.gotIt));
+  const found = [...allItems.filter(i => i.gotIt)].sort((a, b) => a.title.localeCompare(b.title));
 
   const inputClass = `w-full text-sm px-3 py-2.5 rounded-lg border focus:outline-none focus:ring-2 focus:ring-navy-light ${
     darkMode
@@ -258,49 +264,35 @@ export default function WishlistView({ wishlists, onAdd, onToggle, onRemove, dar
         </div>
       </div>
 
-      {/* Genre filter pills */}
-      {allItems.length > 0 && (
-        <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
-          {['All', ...GENRES].map(g => (
-            <button
-              key={g}
-              onClick={() => setGenreFilter(g)}
-              className={`flex-shrink-0 px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
-                genreFilter === g
-                  ? 'bg-navy-light text-white'
-                  : darkMode
-                    ? 'bg-navy-raised text-[#A8906A] hover:bg-navy-border'
-                    : 'bg-cream-page text-ink-500 border border-cream-border hover:bg-cream-border'
-              }`}
-            >
-              {g}
-            </button>
-          ))}
-        </div>
-      )}
-
       {/* Empty state */}
-      {pending.length === 0 && found.length === 0 && (
+      {pendingGroups.length === 0 && found.length === 0 && (
         <div className={`text-center py-10 text-sm italic ${darkMode ? 'text-[#6A7A8A]' : 'text-ink-300'}`}>
-          {allItems.length > 0 ? `No ${genreFilter} books on this list.` : 'No books on this list yet.'}
+          No books on this list yet.
         </div>
       )}
 
-      {/* Pending items */}
-      {pending.length > 0 && (
-        <div className={`rounded-xl overflow-hidden shadow-sm ${darkMode ? 'bg-navy-deep' : 'bg-cream-white'}`}>
-          {pending.map((item, idx) => (
-            <WishlistItem
-              key={item.id}
-              item={item}
-              onToggle={(id) => onToggle(activePerson, id)}
-              onRemove={(id) => onRemove(activePerson, id)}
-              darkMode={darkMode}
-              isLast={idx === pending.length - 1}
-            />
-          ))}
+      {/* Pending items grouped by genre */}
+      {pendingGroups.map(({ genre, items }) => (
+        <div key={genre ?? '__untagged__'}>
+          <div className={`text-xs font-bold uppercase tracking-wider mb-2 px-1 ${
+            darkMode ? 'text-[#6A7A8A]' : 'text-ink-300'
+          }`}>
+            {genre ?? 'Other'}
+          </div>
+          <div className={`rounded-xl overflow-hidden shadow-sm ${darkMode ? 'bg-navy-deep' : 'bg-cream-white'}`}>
+            {items.map((item, idx) => (
+              <WishlistItem
+                key={item.id}
+                item={item}
+                onToggle={(id) => onToggle(activePerson, id)}
+                onRemove={(id) => onRemove(activePerson, id)}
+                darkMode={darkMode}
+                isLast={idx === items.length - 1}
+              />
+            ))}
+          </div>
         </div>
-      )}
+      ))}
 
       {/* Found items */}
       {found.length > 0 && (
