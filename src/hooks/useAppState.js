@@ -221,12 +221,16 @@ export function useAppState() {
     URL.revokeObjectURL(url);
   }, [state]);
 
-  const addWishlistItem = useCallback((person, title, author, thumbnail) => {
+  const addWishlistItem = useCallback((person, title, author, thumbnail, genre) => {
     setState(prev => ({
       ...prev,
       wishlists: {
         ...prev.wishlists,
-        [person]: [...(prev.wishlists[person] || []), { id: makeId(), title, author, gotIt: false, ...(thumbnail ? { thumbnail } : {}) }],
+        [person]: [...(prev.wishlists[person] || []), {
+          id: makeId(), title, author, gotIt: false,
+          ...(thumbnail ? { thumbnail } : {}),
+          ...(genre ? { genre } : {}),
+        }],
       },
     }));
   }, []);

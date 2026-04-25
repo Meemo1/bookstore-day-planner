@@ -3,6 +3,17 @@ import { Check, X, Loader2 } from 'lucide-react';
 
 const AMAZON_ASIN_RE = /\/dp\/([A-Z0-9]{10})/;
 
+const GENRES = [
+  'Cookbooks',
+  'Fantasy',
+  'Literary Fiction/Contemporary',
+  'Mystery',
+  'Non-fiction',
+  'Romance',
+  'Science Fiction',
+  'Suspense',
+];
+
 function WishlistItem({ item, onToggle, onRemove, darkMode, isLast }) {
   return (
     <div className={`flex items-center gap-3 px-4 py-3 ${
@@ -43,6 +54,13 @@ function WishlistItem({ item, onToggle, onRemove, darkMode, isLast }) {
             {item.author}
           </div>
         )}
+        {item.genre && (
+          <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+            darkMode ? 'bg-navy-raised text-[#A8906A]' : 'bg-amber-tint text-amber-dark'
+          }`}>
+            {item.genre}
+          </span>
+        )}
       </div>
       <button
         onClick={() => onRemove(item.id)}
@@ -61,9 +79,11 @@ export default function WishlistView({ wishlists, onAdd, onToggle, onRemove, dar
   const [activePerson, setActivePerson] = useState('emily');
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
+  const [genre, setGenre] = useState('');
   const [thumbnail, setThumbnail] = useState('');
   const [loading, setLoading] = useState(false);
   const [kindleWarning, setKindleWarning] = useState(false);
+  const [genreFilter, setGenreFilter] = useState('All');
 
   const handleTitleChange = async (e) => {
     const val = e.target.value;
@@ -81,7 +101,6 @@ export default function WishlistView({ wishlists, onAdd, onToggle, onRemove, dar
       return;
     }
 
-    // Extract title from the URL slug as a last-resort fallback
     const slugTitle = val.match(/amazon\.[^/]+\/([^/]+)\/dp\//)?.[1]
       ?.replace(/-+/g, ' ').trim() || '';
 
@@ -90,7 +109,6 @@ export default function WishlistView({ wishlists, onAdd, onToggle, onRemove, dar
     try {
       let found = false;
 
-      // 1. Try Google Books
       if (!found) {
         try {
           const apiKey = import.meta.env.VITE_GOOGLE_BOOKS_API_KEY;
@@ -109,7 +127,6 @@ export default function WishlistView({ wishlists, onAdd, onToggle, onRemove, dar
         } catch { /* fall through */ }
       }
 
-      // 2. Try Open Library search
       if (!found) {
         try {
           const res = await fetch(`https://openlibrary.org/search.json?isbn=${asin}&limit=1`);
@@ -127,7 +144,6 @@ export default function WishlistView({ wishlists, onAdd, onToggle, onRemove, dar
         } catch { /* fall through */ }
       }
 
-      // 3. Fall back to title extracted from URL slug
       if (!found) {
         setTitle(slugTitle || val);
       }
@@ -140,21 +156,34 @@ export default function WishlistView({ wishlists, onAdd, onToggle, onRemove, dar
 
   const handleAdd = () => {
     if (!title.trim()) return;
-    onAdd(activePerson, title.trim(), author.trim(), thumbnail || undefined);
+    onAdd(activePerson, title.trim(), author.trim(), thumbnail || undefined, genre || undefined);
     setTitle('');
     setAuthor('');
+    setGenre('');
     setThumbnail('');
     setKindleWarning(false);
   };
 
-  const items = wishlists[activePerson] || [];
-  const pending = items.filter(i => !i.gotIt);
-  const found = items.filter(i => i.gotIt);
+  const allItems = wishlists[activePerson] || [];
+
+  const filterAndSort = (items) =>
+    items
+      .filter(i => genreFilter === 'All' || i.genre === genreFilter)
+      .sort((a, b) => a.title.localeCompare(b.title));
+
+  const pending = filterAndSort(allItems.filter(i => !i.gotIt));
+  const found = filterAndSort(allItems.filter(i => i.gotIt));
 
   const inputClass = `w-full text-sm px-3 py-2.5 rounded-lg border focus:outline-none focus:ring-2 focus:ring-navy-light ${
     darkMode
       ? 'bg-navy-raised border-navy-border text-cream-border placeholder-[#6A7A8A]'
       : 'bg-cream-page border-cream-border text-ink-900 placeholder-ink-300'
+  }`;
+
+  const selectClass = `flex-1 text-sm px-3 py-2.5 rounded-lg border focus:outline-none focus:ring-2 focus:ring-navy-light ${
+    darkMode
+      ? 'bg-navy-raised border-navy-border text-cream-border'
+      : 'bg-cream-page border-cream-border text-ink-900'
   }`;
 
   return (
@@ -203,14 +232,22 @@ export default function WishlistView({ wishlists, onAdd, onToggle, onRemove, dar
             Kindle ASINs can't be looked up — type the title manually.
           </p>
         )}
+        <input
+          value={author}
+          onChange={e => setAuthor(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && !loading && handleAdd()}
+          placeholder="Author (optional)"
+          className={inputClass}
+        />
         <div className="flex gap-2">
-          <input
-            value={author}
-            onChange={e => setAuthor(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && !loading && handleAdd()}
-            placeholder="Author (optional)"
-            className={`${inputClass} flex-1`}
-          />
+          <select
+            value={genre}
+            onChange={e => setGenre(e.target.value)}
+            className={selectClass}
+          >
+            <option value="">Genre (optional)</option>
+            {GENRES.map(g => <option key={g} value={g}>{g}</option>)}
+          </select>
           <button
             onClick={handleAdd}
             disabled={!title.trim() || loading}
@@ -221,10 +258,31 @@ export default function WishlistView({ wishlists, onAdd, onToggle, onRemove, dar
         </div>
       </div>
 
+      {/* Genre filter pills */}
+      {allItems.length > 0 && (
+        <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+          {['All', ...GENRES].map(g => (
+            <button
+              key={g}
+              onClick={() => setGenreFilter(g)}
+              className={`flex-shrink-0 px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
+                genreFilter === g
+                  ? 'bg-navy-light text-white'
+                  : darkMode
+                    ? 'bg-navy-raised text-[#A8906A] hover:bg-navy-border'
+                    : 'bg-cream-page text-ink-500 border border-cream-border hover:bg-cream-border'
+              }`}
+            >
+              {g}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Empty state */}
       {pending.length === 0 && found.length === 0 && (
         <div className={`text-center py-10 text-sm italic ${darkMode ? 'text-[#6A7A8A]' : 'text-ink-300'}`}>
-          No books on this list yet.
+          {allItems.length > 0 ? `No ${genreFilter} books on this list.` : 'No books on this list yet.'}
         </div>
       )}
 
